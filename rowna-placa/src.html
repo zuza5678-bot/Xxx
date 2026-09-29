@@ -1,0 +1,661 @@
+<title>Równa Płaca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: narzędzie analityczne — nagłówek z zapisem, pasek zakładek, jedna kolumna treści z sekcjami kart tam, gdzie coś jest osobnym obiektem */
+:root {
+  --bg: #F3F5F4; --surface: #FFFFFF; --surface-2: #E9EEEC; --line: #D3DBD8;
+  --fg: #16211F; --muted: #5A6A66; --accent: #1E5B4F; --accent-fg: #FFFFFF;
+  --k: #8A4FB8; --m: #1F7F8C;
+  --ok: #2E7D4F; --warn: #B7791F; --crit: #B8412F;
+  --ok-bg: #E3F1E8; --warn-bg: #FBF0DC; --crit-bg: #F8E3DF;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111816; --surface: #19221F; --surface-2: #222D2A; --line: #33413D;
+  --fg: #E6EDEA; --muted: #9AAAA5; --accent: #6FC2AE; --accent-fg: #0D1F1B;
+  --k: #C197E6; --m: #5CC3CF;
+  --ok: #6CC48E; --warn: #E3B15C; --crit: #EE8A78;
+  --ok-bg: #1B3325; --warn-bg: #3A2E17; --crit-bg: #3D211C; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #19221F; --surface-2: #222D2A; --line: #33413D;
+  --fg: #E6EDEA; --muted: #9AAAA5; --accent: #6FC2AE; --accent-fg: #0D1F1B;
+  --k: #C197E6; --m: #5CC3CF;
+  --ok: #6CC48E; --warn: #E3B15C; --crit: #EE8A78;
+  --ok-bg: #1B3325; --warn-bg: #3A2E17; --crit-bg: #3D211C; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.5 }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 0 48px }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.2 }
+h1 { font-size: 1.6rem; font-weight: 700 }
+h2 { font-size: 1.25rem; font-weight: 700 }
+h3 { font-size: 1.02rem; font-weight: 600 }
+p { margin: 0 }
+.muted { color: var(--muted) }
+.small { font-size: .85rem }
+.num, td.n, .mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: .88em }
+
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line) }
+.top-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding-block: 12px 8px }
+.brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-width: 0 }
+.brand .eq { font-family: var(--f-mono); color: var(--accent); font-weight: 600 }
+.top-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.save-state { font-size: .82rem; color: var(--muted) }
+.save-state.dirty { color: var(--warn); font-weight: 600 }
+nav.tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none }
+nav.tabs button { flex: none; border: 0; background: none; color: var(--muted); font: 600 .92rem var(--f-body); padding: 8px 12px; border-bottom: 3px solid transparent; cursor: pointer }
+nav.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent) }
+nav.tabs button:hover { color: var(--fg) }
+
+button, .btn { font: 600 .9rem var(--f-body); border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 7px 12px; cursor: pointer }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg) }
+button:disabled { opacity: .5; cursor: default }
+button.ghost { background: none; border-color: transparent; color: var(--muted); padding: 4px 8px }
+button.ghost:hover { color: var(--crit) }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+input, select, textarea { font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; max-width: 100% }
+textarea { width: 100%; min-height: 64px; resize: vertical }
+label.f { display: grid; gap: 4px; font-size: .85rem; color: var(--muted) }
+
+main { display: grid; gap: 20px; padding-top: 20px }
+section { display: grid; gap: 12px; min-width: 0 }
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; min-width: 0 }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 2px; align-content: start }
+.kpi .lbl { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600 }
+.kpi .val { font-family: var(--f-display); font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums }
+.kpi .sub { font-size: .84rem; color: var(--muted) }
+
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: .78rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; white-space: nowrap }
+.chip.ok { background: var(--ok-bg); color: var(--ok) }
+.chip.warn { background: var(--warn-bg); color: var(--warn) }
+.chip.crit { background: var(--crit-bg); color: var(--crit) }
+.chip.cat { background: var(--surface-2); color: var(--fg); font-family: var(--f-mono) }
+.sx { font-weight: 700; font-family: var(--f-mono) }
+.sx.K { color: var(--k) } .sx.M { color: var(--m) }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50% }
+.dot.K { background: var(--k) } .dot.M { background: var(--m) }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .84rem; color: var(--muted) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface) }
+table { border-collapse: collapse; width: 100%; font-size: .9rem }
+th, td { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle }
+th { font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--surface-2); font-weight: 700; white-space: nowrap }
+td.n, th.n { text-align: right }
+tr:last-child td { border-bottom: 0 }
+tbody tr:hover { background: color-mix(in srgb, var(--surface-2) 50%, transparent) }
+td input[type=number] { width: 96px; text-align: right; font-family: var(--f-mono); font-size: .85rem }
+td select { font-size: .85rem }
+select.lvl { width: 48px; padding: 3px 4px; font-family: var(--f-mono) }
+th.rot { writing-mode: vertical-rl; transform: rotate(180deg); height: 140px; text-transform: none; letter-spacing: 0; font-size: .78rem; text-align: left; vertical-align: bottom }
+th.grp { text-align: center; border-left: 1px solid var(--line) }
+
+.alerts { display: grid; gap: 8px }
+.alert { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; padding: 10px 12px; border-radius: 8px; border-left: 4px solid; font-size: .92rem }
+.alert.crit { background: var(--crit-bg); border-color: var(--crit) }
+.alert.warn { background: var(--warn-bg); border-color: var(--warn) }
+.alert.ok { background: var(--ok-bg); border-color: var(--ok) }
+.alert b { font-weight: 700 }
+
+.cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 14px }
+.catcard { display: grid; gap: 10px; align-content: start }
+.catcard .h { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap }
+.catcard .roman { font-family: var(--f-display); font-size: 1.5rem; font-weight: 700 }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
+.pair > div { background: var(--surface-2); border-radius: 8px; padding: 8px 10px }
+.pair .v { font-family: var(--f-mono); font-weight: 600 }
+ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; font-size: .88rem }
+
+.timeline { display: grid; gap: 0; border-left: 2px solid var(--line); margin-left: 6px }
+.tl { position: relative; padding: 0 0 18px 20px; display: grid; gap: 4px }
+.tl::before { content: ""; position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 2px solid var(--muted) }
+.tl.past::before { background: var(--ok); border-color: var(--ok) }
+.tl.next::before { background: var(--warn); border-color: var(--warn) }
+.tl .d { font-family: var(--f-mono); font-size: .85rem; color: var(--muted) }
+.check { display: grid; grid-template-columns: auto 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); align-items: start }
+.check:last-child { border-bottom: 0 }
+.check input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--accent) }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: end }
+.banner { background: var(--warn-bg); color: var(--fg); border: 1px solid var(--warn); border-radius: 8px; padding: 8px 12px; font-size: .88rem }
+svg text { fill: var(--muted); font-family: var(--f-body); font-size: 12px }
+svg .axis { stroke: var(--line) }
+.chart { width: 100%; height: auto; display: block }
+.range-out { font-family: var(--f-mono); font-weight: 600 }
+.copybox { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 8px 14px; border-radius: 8px; font-weight: 600; z-index: 9; max-width: calc(100% - 32px) }
+details summary { cursor: pointer; font-weight: 600 }
+@media (prefers-reduced-motion: no-preference) { nav.tabs button { transition: color .15s, border-color .15s } }
+@media (max-width: 560px) { h1 { font-size: 1.3rem } .kpi .val { font-size: 1.6rem } }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <div class="brand">
+        <h1>Równa Płaca</h1>
+        <span class="eq">= praca o jednakowej wartości</span>
+      </div>
+      <div class="top-actions">
+        <span id="saveState" class="save-state">Wczytywanie…</span>
+        <button id="btnExport" type="button">Raport CSV</button>
+        <button id="btnSave" class="primary" type="button" disabled>Zapisz</button>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" id="tabs"></nav>
+  </div>
+</header>
+<div class="wrap"><main id="view"></main></div>
+<div id="toast" class="toast" hidden></div>
+
+<script type="application/json" id="seed">/*SEED*/</script>
+<script>
+(function () {
+"use strict";
+const TABS = [
+  ["pulpit", "Pulpit"], ["wartosciowanie", "Wartościowanie"], ["kategorie", "Kategorie"],
+  ["pracownicy", "Pracownicy"], ["widelki", "Widełki"], ["symulacja", "Wyrównanie"],
+  ["obowiazki", "Obowiązki"], ["ustawienia", "Ustawienia"]
+];
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+const SEED = JSON.parse(document.getElementById("seed").textContent);
+let S = null;             // stan
+let dirty = false;
+let tab = "pulpit";
+let filt = { cat: "", sex: "", q: "" };
+let sim = { tol: null, basis: "total" };
+let payBasis = "total";   // total | base
+let rangeMethod = "pct";
+let artifactNs = null, downloadsNs = null, readOnly = false;
+
+try { const h = location.hash.slice(1); if (TABS.some(t => t[0] === h)) tab = h; } catch (e) {}
+try { const t = localStorage.getItem("rp-tab"); if (!location.hash && t && TABS.some(x => x[0] === t)) tab = t; } catch (e) {}
+
+// ---------- obliczenia ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = (n, d = 0) => (isFinite(n) ? n : 0).toLocaleString("pl-PL", { minimumFractionDigits: d, maximumFractionDigits: d });
+const zl = n => fmt(n) + " zł";
+const pct = (n, d = 1) => (n == null || !isFinite(n)) ? "—" : (n > 0 ? "+" : "") + fmt(n, d) + "%";
+const mean = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN;
+const quant = (a, q) => { if (!a.length) return NaN; const s = [...a].sort((x, y) => x - y); const p = (s.length - 1) * q; const lo = Math.floor(p), hi = Math.ceil(p); return s[lo] + (s[hi] - s[lo]) * (p - lo); };
+const median = a => quant(a, .5);
+const posById = id => S.positions.find(p => p.id === id);
+function points(p) { return S.criteria.reduce((sum, c) => sum + c.max * (Number(p.levels[c.id]) || 1) / 5, 0); }
+function maxPoints() { return S.criteria.reduce((s, c) => s + c.max, 0); }
+function catOf(pts) { const b = S.company.bands; let i = 0; for (let k = 0; k < b.length; k++) if (pts >= b[k]) i = k; return i; }
+function empCat(e) { const p = posById(e.pos); return p ? catOf(points(p)) : -1; }
+function pay(e, basis = payBasis) { const f = Number(e.fte) || 1; return ((Number(e.base) || 0) + (basis === "total" ? (Number(e.variable) || 0) : 0)) / f; }
+function gapOf(list, basis = payBasis, fn = mean) {
+  const k = list.filter(e => e.sex === "K").map(e => pay(e, basis)), m = list.filter(e => e.sex === "M").map(e => pay(e, basis));
+  if (!k.length || !m.length) return null;
+  const mk = fn(k), mm = fn(m);
+  return (mm - mk) / mm * 100;
+}
+function catLabel(i) { const b = S.company.bands; return ROMAN[i] + " · " + b[i] + (b[i + 1] != null ? "–" + (b[i + 1] - 1) : "+") + " pkt"; }
+function catStats() {
+  const th = Number(S.company.threshold) || 5;
+  return S.company.bands.map((_, i) => {
+    const emps = S.employees.filter(e => empCat(e) === i);
+    const K = emps.filter(e => e.sex === "K"), M = emps.filter(e => e.sex === "M");
+    const g = gapOf(emps), gm = gapOf(emps, payBasis, median), gb = gapOf(emps, "base");
+    const pos = S.positions.filter(p => catOf(points(p)) === i);
+    const note = S.notes[i] || {};
+    let level = "ok";
+    if (g == null) level = "na"; else if (Math.abs(g) >= th) level = note.status === "justified" ? "justified" : "crit"; else if (Math.abs(g) >= th * .6) level = "warn";
+    return { i, emps, K, M, g, gm, gb, pos, level, small: K.length < 3 || M.length < 3,
+      meanK: mean(K.map(e => pay(e))), meanM: mean(M.map(e => pay(e))) };
+  });
+}
+function quartiles() {
+  const s = [...S.employees].sort((a, b) => pay(a) - pay(b));
+  const n = s.length; const out = [];
+  for (let q = 0; q < 4; q++) {
+    const part = s.slice(Math.round(q * n / 4), Math.round((q + 1) * n / 4));
+    out.push({ k: part.filter(e => e.sex === "K").length, m: part.filter(e => e.sex === "M").length, lo: part.length ? pay(part[0]) : 0, hi: part.length ? pay(part[part.length - 1]) : 0 });
+  }
+  return out;
+}
+function reportDuty(h) {
+  h = Number(h) || 0;
+  if (h >= 250) return { lvl: "crit", t: "Raport co roku", d: "Pierwszy raport do 7 czerwca 2027 r. (za 2026 r.), potem corocznie." };
+  if (h >= 150) return { lvl: "warn", t: "Raport co 3 lata", d: "Pierwszy raport do 7 czerwca 2027 r. (za 2026 r.), potem co trzy lata." };
+  if (h >= 100) return { lvl: "warn", t: "Raport co 3 lata od 2031 r.", d: "Pierwszy raport do 7 czerwca 2031 r., potem co trzy lata." };
+  return { lvl: "ok", t: "Brak obowiązku raportu", d: "Poniżej 100 pracowników dyrektywa nie nakłada obowiązku raportowania luki (pozostałe obowiązki jawności obowiązują)." };
+}
+// wyrównanie: podnosimy najniżej opłacane osoby z grupy o niższej średniej do progu F (wyszukiwanie binarne), aż luka ≤ tolerancja
+function equalize(emps, tol, basis) {
+  const K = emps.filter(e => e.sex === "K"), M = emps.filter(e => e.sex === "M");
+  if (!K.length || !M.length) return { cost: 0, raises: [] };
+  const mk = mean(K.map(e => pay(e, basis))), mm = mean(M.map(e => pay(e, basis)));
+  const low = mk < mm ? K : M, high = mk < mm ? M : K;
+  const target = mean(high.map(e => pay(e, basis))) * (1 - tol / 100);
+  const cur = mean(low.map(e => pay(e, basis)));
+  if (cur >= target) return { cost: 0, raises: [], lowSex: low[0].sex };
+  const meanAt = F => mean(low.map(e => Math.max(pay(e, basis), F)));
+  let a = Math.min(...low.map(e => pay(e, basis))), b = target * 3;
+  for (let i = 0; i < 60; i++) { const mid = (a + b) / 2; if (meanAt(mid) < target) a = mid; else b = mid; }
+  const F = Math.ceil(b / 10) * 10;
+  const raises = low.filter(e => pay(e, basis) < F).map(e => ({ e, from: pay(e, basis), to: F, cost: (F - pay(e, basis)) * (Number(e.fte) || 1) }));
+  return { cost: raises.reduce((s, r) => s + r.cost, 0), raises, floor: F, lowSex: low[0].sex };
+}
+function rangeFor(i) {
+  const emps = S.employees.filter(e => empCat(e) === i).map(e => pay(e, "base"));
+  if (!emps.length) return null;
+  let lo, hi;
+  if (rangeMethod === "pct") { lo = quant(emps, .1); hi = quant(emps, .9); }
+  else { const md = median(emps); lo = md * .85; hi = md * 1.15; }
+  if (hi - lo < 400) { const c = (lo + hi) / 2; lo = c - 200; hi = c + 200; }
+  return { lo: Math.floor(lo / 100) * 100, hi: Math.ceil(hi / 100) * 100, n: emps.length };
+}
+
+// ---------- wykresy (SVG) ----------
+function gapChart(stats) {
+  const th = Number(S.company.threshold) || 5;
+  const rows = stats.filter(s => s.g != null || s.emps.length);
+  const W = 520, rowH = 34, top = 26, left = 120, right = 64, H = top + rows.length * rowH + 30;
+  const mx = Math.max(10, ...rows.map(s => Math.abs(s.g || 0))) * 1.1;
+  const x = v => left + (v + mx) / (2 * mx) * (W - left - right);
+  let o = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Luka płacowa w kategoriach">`;
+  o += `<rect x="${x(-th)}" y="${top - 6}" width="${x(th) - x(-th)}" height="${rows.length * rowH + 6}" fill="var(--ok-bg)"/>`;
+  const ticks = [-Math.floor(mx / 5) * 5, 0, Math.floor(mx / 5) * 5];
+  ticks.forEach(t => { o += `<line class="axis" x1="${x(t)}" x2="${x(t)}" y1="${top - 6}" y2="${top + rows.length * rowH}" stroke-dasharray="${t ? "3 3" : "0"}"/><text x="${x(t)}" y="${H - 12}" text-anchor="middle">${t > 0 ? "+" : ""}${t}%</text>`; });
+  rows.forEach((s, r) => {
+    const y = top + r * rowH + 6;
+    o += `<text x="0" y="${y + 15}" style="fill:var(--fg);font-weight:600">${ROMAN[s.i]}</text><text x="26" y="${y + 15}">${s.K.length} K · ${s.M.length} M</text>`;
+    if (s.g == null) { o += `<text x="${x(0) + 6}" y="${y + 15}">brak porównania</text>`; return; }
+    const col = s.level === "crit" ? "var(--crit)" : s.level === "warn" ? "var(--warn)" : s.level === "justified" ? "var(--muted)" : "var(--ok)";
+    const x0 = x(Math.min(0, s.g)), w = Math.abs(x(s.g) - x(0));
+    o += `<rect x="${x0}" y="${y}" width="${Math.max(w, 2)}" height="20" rx="3" fill="${col}"/>`;
+    const lx = s.g >= 0 ? x(s.g) + 6 : x(s.g) - 6;
+    o += `<text x="${lx}" y="${y + 15}" text-anchor="${s.g >= 0 ? "start" : "end"}" style="fill:var(--fg);font-family:var(--f-mono);font-weight:600">${pct(s.g)}</text>`;
+  });
+  o += `<text x="${x(0) + 4}" y="12">na korzyść M →</text><text x="${x(0) - 4}" y="12" text-anchor="end">← na korzyść K</text></svg>`;
+  return o;
+}
+function quartChart(q) {
+  const W = 520, rowH = 38, left = 130, H = q.length * rowH + 8;
+  const names = ["Q1 najniższe", "Q2", "Q3", "Q4 najwyższe"];
+  let o = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Udział kobiet i mężczyzn w kwartylach płac">`;
+  q.forEach((r, i) => {
+    const y = i * rowH + 4, tot = r.k + r.m || 1, wk = (W - left) * r.k / tot;
+    o += `<text x="0" y="${y + 13}" style="fill:var(--fg);font-weight:600">${names[i]}</text><text x="0" y="${y + 28}">${fmt(r.lo)}–${fmt(r.hi)} zł</text>`;
+    o += `<rect x="${left}" y="${y}" width="${wk}" height="28" fill="var(--k)"/><rect x="${left + wk}" y="${y}" width="${W - left - wk}" height="28" fill="var(--m)"/>`;
+    if (r.k) o += `<text x="${left + 6}" y="${y + 19}" style="fill:#fff;font-weight:700">K ${Math.round(r.k / tot * 100)}%</text>`;
+    if (r.m) o += `<text x="${W - 6}" y="${y + 19}" text-anchor="end" style="fill:#fff;font-weight:700">M ${Math.round(r.m / tot * 100)}%</text>`;
+  });
+  return o + "</svg>";
+}
+function scatter() {
+  const W = 1000, H = 400, l = 64, r = 14, t = 14, b = 40;
+  const data = S.employees.map(e => { const p = posById(e.pos); return p ? { e, x: points(p), y: pay(e) } : null; }).filter(Boolean);
+  if (!data.length) return "";
+  const xs = data.map(d => d.x), ys = data.map(d => d.y);
+  const x0 = Math.floor((Math.min(...xs) - 30) / 100) * 100, x1 = Math.ceil((Math.max(...xs) + 30) / 100) * 100;
+  const y1 = Math.ceil(Math.max(...ys) / 2000) * 2000, y0 = Math.max(0, Math.floor(Math.min(...ys) / 2000) * 2000);
+  const X = v => l + (v - x0) / (x1 - x0) * (W - l - r), Y = v => t + (1 - (v - y0) / (y1 - y0)) * (H - t - b);
+  let o = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Punkty wartościowania a wynagrodzenie">`;
+  for (let v = y0; v <= y1; v += 2000) o += `<line class="axis" x1="${l}" x2="${W - r}" y1="${Y(v)}" y2="${Y(v)}" stroke-opacity=".6"/><text x="${l - 6}" y="${Y(v) + 4}" text-anchor="end">${fmt(v / 1000)} tys.</text>`;
+  S.company.bands.forEach((bd, i) => { if (bd > x0 && bd < x1) o += `<line class="axis" x1="${X(bd)}" x2="${X(bd)}" y1="${t}" y2="${H - b}" stroke-dasharray="4 4"/>`; const nx = S.company.bands[i + 1] ?? x1; const mid = (Math.max(bd, x0) + Math.min(nx, x1)) / 2; if (mid > x0 && mid < x1) o += `<text x="${X(mid)}" y="${H - b + 16}" text-anchor="middle" style="font-weight:700">${ROMAN[i]}</text>`; });
+  o += `<text x="${(W + l) / 2}" y="${H - 4}" text-anchor="middle">punkty wartościowania stanowiska</text>`;
+  // linia polityki płacowej (regresja liniowa)
+  const n = data.length, mx = mean(xs), my = mean(ys);
+  const sl = data.reduce((s, d) => s + (d.x - mx) * (d.y - my), 0) / (data.reduce((s, d) => s + (d.x - mx) ** 2, 0) || 1);
+  const ic = my - sl * mx;
+  o += `<line x1="${X(x0)}" y1="${Y(ic + sl * x0)}" x2="${X(x1)}" y2="${Y(ic + sl * x1)}" stroke="var(--fg)" stroke-opacity=".45" stroke-width="2" stroke-dasharray="6 4"/>`;
+  data.forEach(d => { const jit = ((parseInt(d.e.id.replace(/\D/g, "")) || 0) % 7 - 3) * 1.6; o += `<circle cx="${X(d.x) + jit}" cy="${Y(d.y)}" r="4.5" fill="var(--${d.e.sex === "K" ? "k" : "m"})" fill-opacity=".8"><title>${esc(d.e.id)} · ${esc(posById(d.e.pos).name)} · ${d.e.sex} · ${zl(d.y)}</title></circle>`; });
+  return o + "</svg>";
+}
+
+// ---------- widoki ----------
+function renderTabs() {
+  $("#tabs").innerHTML = TABS.map(([id, name]) => `<button role="tab" type="button" data-tab="${id}" aria-selected="${id === tab}">${name}</button>`).join("");
+}
+function basisToggle() {
+  return `<label class="f" style="display:flex;gap:8px;align-items:center">Porównuj: <select id="payBasis"><option value="total"${payBasis === "total" ? " selected" : ""}>wynagrodzenie całkowite</option><option value="base"${payBasis === "base" ? " selected" : ""}>tylko zasadnicze</option></select></label>`;
+}
+function sampleBanner() { return S.sample ? `<div class="banner">To są <b>dane przykładowe</b> (78 fikcyjnych osób). Wgraj własne w zakładce Pracownicy (import CSV) i ustaw stanowiska w Wartościowaniu. Na wynagrodzenia przeliczone na pełny etat.</div>` : ""; }
+
+function vPulpit() {
+  const st = catStats(), all = S.employees;
+  const g = gapOf(all), gm = gapOf(all, payBasis, median);
+  const flagged = st.filter(s => s.level === "crit");
+  const tol = Number(S.company.threshold) || 5;
+  const cost = flagged.reduce((s, c) => s + equalize(c.emps, 0, payBasis).cost, 0);
+  const annual = cost * 12 * (1 + (Number(S.company.zus) || 0) / 100);
+  const duty = reportDuty(S.company.headcount);
+  const alerts = [];
+  if (flagged.length) alerts.push(["crit", `<b>${flagged.length === 1 ? "Kategoria" : "Kategorie"} ${flagged.map(s => ROMAN[s.i] + " (" + pct(s.g) + ")").join(", ")}</b> ${flagged.length === 1 ? "przekracza" : "przekraczają"} próg ${tol}% bez uzasadnienia. Jeśli luka nie zostanie wyjaśniona obiektywnymi kryteriami ani usunięta w ciągu 6 miesięcy od raportu, konieczna będzie wspólna ocena wynagrodzeń z przedstawicielami pracowników. Uzupełnij status w zakładce Kategorie.`]);
+  st.filter(s => s.level === "justified").forEach(s => alerts.push(["warn", `<b>Kategoria ${ROMAN[s.i]}: luka ${pct(s.g)}</b> oznaczona jako uzasadniona. Upewnij się, że uzasadnienie opiera się na obiektywnych, neutralnych płciowo kryteriach i jest udokumentowane.`]));
+  st.filter(s => s.g != null && s.small && s.level !== "crit").forEach(s => alerts.push(["warn", `<b>Kategoria ${ROMAN[s.i]}</b>: mniej niż 3 osoby jednej płci (${s.K.length} K, ${s.M.length} M). Wynik jest wrażliwy na pojedyncze wynagrodzenia i może ujawniać dane osobowe w raporcie.`]));
+  st.filter(s => s.emps.length && s.g == null).forEach(s => alerts.push(["warn", `<b>Kategoria ${ROMAN[s.i]}</b> jest jednopłciowa (${s.emps.length} os.), więc luki nie da się policzyć. Sprawdź, czy stanowiska w innych kategoriach nie są zaniżone lub zawyżone w wartościowaniu.`]));
+  const q = quartiles();
+  if (q[3].k / ((q[3].k + q[3].m) || 1) < q[0].k / ((q[0].k + q[0].m) || 1) - .15) alerts.push(["warn", `<b>Segregacja pionowa:</b> kobiety stanowią ${Math.round(q[0].k / (q[0].k + q[0].m) * 100)}% najniższego kwartyla płac i tylko ${Math.round(q[3].k / (q[3].k + q[3].m) * 100)}% najwyższego.`]);
+  if (!alerts.length) alerts.push(["ok", "Żadna kategoria nie przekracza progu. Utrzymuj dokumentację kryteriów i powtarzaj analizę po każdej rewizji płac."]);
+  return `${sampleBanner()}
+  <section><div class="sec-head"><h2>${esc(S.company.name)}</h2>${basisToggle()}</div>
+  <div class="kpis">
+    <div class="kpi"><span class="lbl">Luka ogółem · średnia</span><span class="val">${pct(g)}</span><span class="sub">${g > 0 ? "na korzyść mężczyzn" : g < 0 ? "na korzyść kobiet" : ""} · ${all.filter(e => e.sex === "K").length} K / ${all.filter(e => e.sex === "M").length} M</span></div>
+    <div class="kpi"><span class="lbl">Luka ogółem · mediana</span><span class="val">${pct(gm)}</span><span class="sub">odporna na skrajne pensje</span></div>
+    <div class="kpi"><span class="lbl">Kategorie ≥ ${tol}%</span><span class="val">${flagged.length}<span class="muted" style="font-size:1rem"> / ${st.filter(s => s.g != null).length}</span></span><span class="sub">bez uzasadnienia, wymagają działań</span></div>
+    <div class="kpi"><span class="lbl">Koszt pełnego wyrównania</span><span class="val">${fmt(annual / 1000, 0)} tys.</span><span class="sub">zł rocznie z ZUS pracodawcy · ${zl(cost)} mies.</span></div>
+  </div></section>
+  <section><h2>Na co zwrócić uwagę</h2><div class="alerts">${alerts.map(a => `<div class="alert ${a[0]}"><span class="chip ${a[0]}">${a[0] === "crit" ? "Działaj" : a[0] === "warn" ? "Sprawdź" : "OK"}</span><div>${a[1]}</div></div>`).join("")}</div></section>
+  <div class="grid2">
+    <section class="card"><h3>Luka w kategoriach pracy o jednakowej wartości</h3><p class="muted small">(średnia M − średnia K) / średnia M. Zielony pas to dopuszczalny próg.</p>${gapChart(st)}</section>
+    <section class="card"><h3>Kwartyle płac</h3><p class="muted small">Wymagany element raportu: udział płci w każdej ćwiartce listy płac.</p>${quartChart(q)}<div class="legend"><span><i class="dot K"></i>Kobiety</span><span><i class="dot M"></i>Mężczyźni</span></div></section>
+  </div>
+  <section class="card"><div class="sec-head"><h3>Linia polityki płacowej</h3><div class="legend"><span><i class="dot K"></i>K</span><span><i class="dot M"></i>M</span><span>– – trend płac względem wartości pracy</span></div></div>
+  <p class="muted small">Każdy punkt to osoba. Punkty wyraźnie pod linią przy danej wartości stanowiska to kandydaci do przeglądu, niezależnie od płci.</p>${scatter()}</section>
+  <section class="card"><div class="sec-head"><h3>Obowiązek raportowania</h3><span class="chip ${duty.lvl}">${duty.t}</span></div><p>${duty.d} Liczba pracowników w Ustawieniach: <b>${fmt(S.company.headcount)}</b>.</p></section>`;
+}
+
+function vWart() {
+  const groups = [...new Set(S.criteria.map(c => c.group))];
+  const counts = id => { const e = S.employees.filter(x => x.pos === id); return [e.filter(x => x.sex === "K").length, e.filter(x => x.sex === "M").length]; };
+  const rows = [...S.positions].sort((a, b) => points(a) - points(b)).map(p => {
+    const pts = points(p), c = catOf(pts), [k, m] = counts(p.id);
+    const dom = k + m ? (k / (k + m) >= .7 ? `<span class="chip" style="background:var(--surface-2);color:var(--k)">K ${Math.round(k / (k + m) * 100)}%</span>` : m / (k + m) >= .7 ? `<span class="chip" style="background:var(--surface-2);color:var(--m)">M ${Math.round(m / (k + m) * 100)}%</span>` : `<span class="chip" style="background:var(--surface-2);color:var(--muted)">mieszane</span>`) : "";
+    return `<tr><td style="min-width:220px"><input data-pos-name="${p.id}" value="${esc(p.name)}" style="width:100%;font-weight:600"><div class="small muted" style="display:flex;gap:6px;align-items:center;margin-top:3px"><input data-pos-dept="${p.id}" value="${esc(p.dept)}" style="width:130px;font-size:.8rem;padding:2px 6px"> ${dom}</div></td>
+    ${S.criteria.map(cr => `<td><select class="lvl" data-lvl="${p.id}" data-crit="${cr.id}" aria-label="${esc(cr.name)}">${[1, 2, 3, 4, 5].map(v => `<option${Number(p.levels[cr.id]) === v ? " selected" : ""}>${v}</option>`).join("")}</select></td>`).join("")}
+    <td class="n"><b>${fmt(pts)}</b></td><td><span class="chip cat">${ROMAN[c]}</span></td><td class="n">${k}/${m}</td>
+    <td><button class="ghost" data-del-pos="${p.id}" title="Usuń stanowisko" aria-label="Usuń ${esc(p.name)}">✕</button></td></tr>`;
+  }).join("");
+  return `${sampleBanner()}<section><div class="sec-head"><div><h2>Wartościowanie stanowisk</h2><p class="muted small">Kryteria z art. 4 dyrektywy 2023/970: umiejętności, wysiłek, odpowiedzialność, warunki pracy. Każde kryterium ocen w skali 1–5; punkty = waga × poziom / 5 (maks. ${fmt(maxPoints())}). Oceniaj stanowisko, nie osobę.</p></div>
+  <button type="button" id="addPos">+ Dodaj stanowisko</button></div>
+  <div class="tbl-wrap"><table><thead><tr><th rowspan="2">Stanowisko / dział</th>${groups.map(g => `<th class="grp" colspan="${S.criteria.filter(c => c.group === g).length}">${g}</th>`).join("")}<th rowspan="2" class="n">Pkt</th><th rowspan="2">Kat.</th><th rowspan="2" class="n">K/M</th><th rowspan="2"></th></tr>
+  <tr>${S.criteria.map(c => `<th class="rot" title="${esc(c.desc)}">${esc(c.name)} <span class="mono">(${c.max})</span></th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div></section>
+  <section class="card"><h3>Skala poziomów</h3><div class="grid2 small" style="gap:6px 24px"><p><b class="mono">1</b> minimalne / sporadyczne</p><p><b class="mono">2</b> podstawowe</p><p><b class="mono">3</b> średnie, typowe dla samodzielnego specjalisty</p><p><b class="mono">4</b> wysokie, częste, istotne skutki</p><p><b class="mono">5</b> bardzo wysokie, stałe, krytyczne skutki</p></div>
+  <details class="small"><summary>Opisy kryteriów</summary><ul class="plain" style="margin-top:8px">${S.criteria.map(c => `<li><b>${esc(c.name)}</b> (${esc(c.group)}, maks. ${c.max} pkt): ${esc(c.desc)}</li>`).join("")}</ul></details>
+  <p class="small muted">Wskazówka: stanowiska sfeminizowane (np. obsługa klienta, asystentki) często mają niedoszacowane umiejętności interpersonalne i obciążenie psychiczne. Porównaj je ze stanowiskami zmaskulinizowanymi o podobnej liczbie punktów.</p></section>`;
+}
+
+function vKat() {
+  const st = catStats(), th = Number(S.company.threshold) || 5;
+  const lv = { ok: ["ok", "Poniżej progu"], warn: ["warn", "Blisko progu"], crit: ["crit", "Przekracza próg"], justified: ["warn", "Uzasadniona"], na: ["cat", "Brak porównania"] };
+  return `${sampleBanner()}<section><div class="sec-head"><div><h2>Kategorie pracowników</h2><p class="muted small">Stanowiska z tej samej kategorii punktowej traktowane są jako praca o jednakowej wartości. Luka ≥ ${th}% bez obiektywnego uzasadnienia oznacza obowiązek wspólnej oceny wynagrodzeń.</p></div>${basisToggle()}</div>
+  <div class="cats">${st.map(s => {
+    const [cls, txt] = lv[s.level]; const note = S.notes[s.i] || {};
+    return `<article class="card catcard"><div class="h"><div><span class="roman">${ROMAN[s.i]}</span> <span class="muted small">${catLabel(s.i).split(" · ")[1]}</span></div><span class="chip ${cls}">${txt}</span></div>
+    ${s.emps.length ? `<div class="pair"><div><div class="small muted">Średnia K (${s.K.length})</div><div class="v sx K">${s.K.length ? zl(s.meanK) : "—"}</div></div><div><div class="small muted">Średnia M (${s.M.length})</div><div class="v sx M">${s.M.length ? zl(s.meanM) : "—"}</div></div></div>
+    <div class="small" style="display:flex;gap:14px;flex-wrap:wrap"><span>Luka średnia <b class="mono">${pct(s.g)}</b></span><span>mediana <b class="mono">${pct(s.gm)}</b></span><span>zasadnicze <b class="mono">${pct(s.gb)}</b></span></div>` : `<p class="muted small">Brak pracowników w tej kategorii.</p>`}
+    <ul class="plain">${s.pos.map(p => { const e = S.employees.filter(x => x.pos === p.id); const gk = gapOf(e); return `<li style="display:flex;justify-content:space-between;gap:8px"><span>${esc(p.name)} <span class="muted mono small">${fmt(points(p))}</span></span><span class="mono small muted">${e.filter(x => x.sex === "K").length}K/${e.filter(x => x.sex === "M").length}M${gk != null ? " · " + pct(gk) : ""}</span></li>`; }).join("") || '<li class="muted">Brak stanowisk</li>'}</ul>
+    ${s.emps.length ? `<label class="f">Status<select data-note-status="${s.i}"><option value="">— do analizy —</option><option value="review"${note.status === "review" ? " selected" : ""}>w trakcie wyjaśniania</option><option value="justified"${note.status === "justified" ? " selected" : ""}>uzasadniona obiektywnymi kryteriami</option><option value="plan"${note.status === "plan" ? " selected" : ""}>plan wyrównania przyjęty</option></select></label>
+    <label class="f">Uzasadnienie / plan działań<textarea data-note-text="${s.i}" placeholder="Np. różnica wynika ze stażu i ocen okresowych; dokumentacja: …">${esc(note.text || "")}</textarea></label>` : ""}
+    </article>`; }).join("")}</div></section>`;
+}
+
+function vPrac() {
+  const q = filt.q.trim().toLowerCase();
+  const cats = catStats();
+  const med = {}; cats.forEach(c => med[c.i] = median(c.emps.map(e => pay(e))));
+  const list = S.employees.filter(e => (!filt.sex || e.sex === filt.sex) && (filt.cat === "" || empCat(e) === Number(filt.cat)) && (!q || (e.id + " " + (posById(e.pos)?.name || "")).toLowerCase().includes(q)));
+  const opts = S.positions.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join("");
+  return `${sampleBanner()}<section><div class="sec-head"><div><h2>Pracownicy</h2><p class="muted small">Kwoty miesięczne brutto za faktyczny wymiar etatu. Analiza przelicza je na pełny etat. Zmienne = średnia miesięczna premii i dodatków. Bez nazwisk: wystarczy identyfikator.</p></div>
+  <div class="toolbar"><button type="button" id="addEmp">+ Dodaj osobę</button><label class="btn" for="csvIn" style="display:inline-block">Importuj CSV</label><input type="file" id="csvIn" accept=".csv,text/csv,text/plain" hidden><button type="button" id="csvTpl">Wzór CSV</button></div></div>
+  <div class="toolbar"><label class="f">Szukaj<input id="fq" value="${esc(filt.q)}" placeholder="ID lub stanowisko"></label>
+  <label class="f">Kategoria<select id="fcat"><option value="">wszystkie</option>${S.company.bands.map((_, i) => `<option value="${i}"${filt.cat === String(i) ? " selected" : ""}>${ROMAN[i]}</option>`).join("")}</select></label>
+  <label class="f">Płeć<select id="fsex"><option value="">wszystkie</option><option${filt.sex === "K" ? " selected" : ""}>K</option><option${filt.sex === "M" ? " selected" : ""}>M</option></select></label>
+  <span class="muted small" style="padding-bottom:6px">${list.length} z ${S.employees.length} osób</span></div>
+  <div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Stanowisko</th><th>Płeć</th><th class="n">Zasadnicze</th><th class="n">Zmienne</th><th class="n">Etat</th><th class="n">Staż (lata)</th><th>Kat.</th><th class="n">Pełny etat</th><th class="n" title="Wynagrodzenie względem mediany kategorii">Wsk. do mediany</th><th></th></tr></thead><tbody>
+  ${list.map(e => { const c = empCat(e), pf = pay(e), cr = med[c] ? pf / med[c] : NaN; const crc = !isFinite(cr) ? "" : cr < .9 ? "crit" : cr > 1.1 ? "warn" : "ok";
+    return `<tr><td><input data-emp="${e.id}" data-f="id" value="${esc(e.id)}" style="width:78px" class="mono"></td>
+    <td><select data-emp="${e.id}" data-f="pos" style="max-width:250px">${opts.replace(`value="${e.pos}"`, `value="${e.pos}" selected`)}</select></td>
+    <td><select data-emp="${e.id}" data-f="sex" class="sx ${e.sex}"><option${e.sex === "K" ? " selected" : ""}>K</option><option${e.sex === "M" ? " selected" : ""}>M</option></select></td>
+    <td class="n"><input type="number" step="50" min="0" data-emp="${e.id}" data-f="base" value="${e.base}"></td>
+    <td class="n"><input type="number" step="50" min="0" data-emp="${e.id}" data-f="variable" value="${e.variable}"></td>
+    <td class="n"><input type="number" step="0.05" min="0.05" max="1" data-emp="${e.id}" data-f="fte" value="${e.fte}" style="width:70px"></td>
+    <td class="n"><input type="number" step="0.5" min="0" data-emp="${e.id}" data-f="tenure" value="${e.tenure ?? ""}" style="width:70px"></td>
+    <td><span class="chip cat">${ROMAN[c] ?? "?"}</span></td><td class="n">${fmt(pf)}</td>
+    <td class="n">${isFinite(cr) ? `<span class="chip ${crc}">${fmt(cr * 100)}%</span>` : "—"}</td>
+    <td><button class="ghost" data-del-emp="${e.id}" aria-label="Usuń ${esc(e.id)}">✕</button></td></tr>`; }).join("")}
+  </tbody></table></div>
+  <p class="small muted">Import CSV (separator ; lub ,): <span class="mono">id;stanowisko;plec;zasadnicze;zmienne;etat;staz</span>. Stanowisko musi mieć taką samą nazwę jak w Wartościowaniu; brakujące stanowiska zostaną dodane z poziomem 3 we wszystkich kryteriach. Import zastępuje obecną listę.</p></section>`;
+}
+
+function vWid() {
+  const rows = S.company.bands.map((_, i) => ({ i, r: rangeFor(i), pos: S.positions.filter(p => catOf(points(p)) === i) })).filter(x => x.pos.length);
+  return `${sampleBanner()}<section><div class="sec-head"><div><h2>Widełki do ogłoszeń</h2><p class="muted small">Od 24.12.2025 kandydat musi znać wynagrodzenie (kwotę lub przedział) przed rozmową: w ogłoszeniu albo przed nawiązaniem stosunku pracy. Widełki liczone z wynagrodzeń zasadniczych na pełny etat w danej kategorii.</p></div>
+  <label class="f">Metoda<select id="rangeMethod"><option value="pct"${rangeMethod === "pct" ? " selected" : ""}>percentyl 10–90 w kategorii</option><option value="mid"${rangeMethod === "mid" ? " selected" : ""}>mediana ±15%</option></select></label></div>
+  <div class="cats">${rows.map(x => `<article class="card catcard"><div class="h"><div><span class="roman">${ROMAN[x.i]}</span> <span class="muted small">${catLabel(x.i).split(" · ")[1]}</span></div>${x.r ? `<span class="range-out">${fmt(x.r.lo)}–${fmt(x.r.hi)} zł</span>` : `<span class="chip warn">brak danych</span>`}</div>
+    ${x.r ? `<p class="small muted">na podstawie ${x.r.n} wynagrodzeń</p>` : `<p class="small muted">Brak pracowników w kategorii: ustal widełki z raportu rynkowego.</p>`}
+    <ul class="plain">${x.pos.map(p => { const txt = x.r ? `${p.name}: wynagrodzenie zasadnicze ${fmt(x.r.lo)}–${fmt(x.r.hi)} zł brutto miesięcznie (pełny etat).` : ""; return `<li class="copybox" style="justify-content:space-between"><span>${esc(p.name)}</span>${x.r ? `<button type="button" class="ghost" style="color:var(--accent)" data-copy="${esc(txt)}">Kopiuj tekst</button>` : ""}</li>`; }).join("")}</ul></article>`).join("")}</section>
+  <section class="card"><h3>Jak pisać ogłoszenie zgodnie z nowymi przepisami</h3><ul class="small" style="margin:0;padding-left:18px;display:grid;gap:4px">
+  <li>Podaj kwotę lub przedział wynagrodzenia (brutto, miesięcznie) oparty na obiektywnych, neutralnych płciowo kryteriach.</li>
+  <li>Nazwa stanowiska neutralna płciowo, np. „Księgowy / Księgowa” albo „Księgowy (K/M)”.</li>
+  <li>Nie pytaj kandydatów o obecne ani wcześniejsze wynagrodzenia.</li>
+  <li>Proces rekrutacji prowadź w sposób niedyskryminujący; kryteria oceny kandydatów spisz przed rozmowami.</li></ul></section>`;
+}
+
+function vSym() {
+  const th = Number(S.company.threshold) || 5;
+  const tol = sim.tol == null ? 0 : sim.tol;
+  const st = catStats();
+  const zus = (Number(S.company.zus) || 0) / 100;
+  const res = st.filter(s => s.g != null).map(s => ({ s, r: equalize(s.emps, tol, sim.basis) }));
+  const tot = res.reduce((a, x) => a + x.r.cost, 0), ppl = res.reduce((a, x) => a + x.r.raises.length, 0);
+  return `${sampleBanner()}<section><div class="sec-head"><div><h2>Symulacja wyrównania</h2><p class="muted small">Model podnosi wynagrodzenia najniżej opłacanych osób z niedopłacanej grupy do wspólnego minimum, aż luka w kategorii spadnie do wybranego poziomu. To najtańszy wariant zamykający lukę średnią. Przed decyzją sprawdź indywidualne przypadki.</p></div></div>
+  <div class="toolbar card" style="align-items:center">
+    <label class="f" style="min-width:220px">Docelowa luka maks.: <b class="mono" id="tolOut">${fmt(tol, 1)}%</b><input type="range" id="tol" min="0" max="${th}" step="0.5" value="${tol}"></label>
+    <label class="f">Podstawa<select id="simBasis"><option value="total"${sim.basis === "total" ? " selected" : ""}>wynagrodzenie całkowite</option><option value="base"${sim.basis === "base" ? " selected" : ""}>zasadnicze</option></select></label>
+  </div>
+  <div class="kpis"><div class="kpi"><span class="lbl">Koszt miesięczny</span><span class="val">${zl(tot)}</span><span class="sub">brutto pracownika</span></div>
+  <div class="kpi"><span class="lbl">Koszt roczny z ZUS</span><span class="val">${zl(tot * 12 * (1 + zus))}</span><span class="sub">×12, narzut pracodawcy ${fmt(zus * 100, 2)}%</span></div>
+  <div class="kpi"><span class="lbl">Osoby z podwyżką</span><span class="val">${ppl}</span><span class="sub">z ${S.employees.length} w analizie</span></div></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Kat.</th><th class="n">Luka teraz</th><th>Grupa niedopłacana</th><th class="n">Nowe minimum</th><th class="n">Osoby</th><th class="n">Koszt / mies.</th><th class="n">Koszt / rok z ZUS</th></tr></thead><tbody>
+  ${res.map(x => `<tr><td><span class="chip cat">${ROMAN[x.s.i]}</span></td><td class="n">${pct(gapOf(x.s.emps, sim.basis))}</td><td>${x.r.raises.length ? `<span class="sx ${x.r.lowSex}">${x.r.lowSex}</span>` : '<span class="muted">—</span>'}</td><td class="n">${x.r.raises.length ? zl(x.r.floor) : "—"}</td><td class="n">${x.r.raises.length}</td><td class="n">${zl(x.r.cost)}</td><td class="n">${zl(x.r.cost * 12 * (1 + zus))}</td></tr>`).join("")}
+  </tbody></table></div>
+  ${ppl ? `<details class="card"><summary>Lista indywidualnych podwyżek (${ppl})</summary><div class="tbl-wrap" style="margin-top:10px"><table><thead><tr><th>ID</th><th>Stanowisko</th><th>Kat.</th><th class="n">Teraz (pełny etat)</th><th class="n">Po zmianie</th><th class="n">Podwyżka</th></tr></thead><tbody>
+  ${res.flatMap(x => x.r.raises.map(r => `<tr><td class="mono">${esc(r.e.id)}</td><td>${esc(posById(r.e.pos)?.name)}</td><td>${ROMAN[x.s.i]}</td><td class="n">${zl(r.from)}</td><td class="n">${zl(r.to)}</td><td class="n">+${fmt((r.to / r.from - 1) * 100, 1)}%</td></tr>`)).join("")}</tbody></table></div></details>` : ""}
+  </section>`;
+}
+
+const CHECK = [
+  ["widelki", "Widełki lub kwota wynagrodzenia w ogłoszeniach albo przekazywane kandydatom przed rozmową", "Obowiązuje od 24.12.2025."],
+  ["nazwy", "Neutralne płciowo nazwy stanowisk i niedyskryminujący proces rekrutacji", "Obowiązuje od 24.12.2025."],
+  ["historia", "Usunięte pytania o obecne i poprzednie wynagrodzenie z formularzy i scenariuszy rozmów", "Obowiązuje od 24.12.2025."],
+  ["kryteria", "Spisane, obiektywne i neutralne płciowo kryteria ustalania wynagrodzeń i podwyżek, dostępne dla pracowników", "Dyrektywa 2023/970, art. 6."],
+  ["wartosciowanie", "Wartościowanie stanowisk i podział na kategorie pracy o jednakowej wartości", "Podstawa raportu i odpowiedzi na wnioski pracowników."],
+  ["wnioski", "Procedura odpowiedzi na wniosek pracownika o informację o wynagrodzeniach (średnie w kategorii wg płci, do 2 miesięcy)", "Dyrektywa 2023/970, art. 7."],
+  ["poufnosc", "Usunięte z umów klauzule zakazujące ujawniania własnego wynagrodzenia", "Dyrektywa 2023/970, art. 7 ust. 5."],
+  ["dane", "System kadrowo-płacowy raportuje płeć, kategorię, składniki stałe i zmienne, wymiar etatu", "Potrzebne do raportu za 2026 r."],
+  ["szkolenia", "Szkolenie managerów z rozmów o wynagrodzeniach i nowych zasad", "Dobra praktyka."],
+];
+function vObow() {
+  const now = new Date();
+  const duty = reportDuty(S.company.headcount);
+  const TL = [
+    ["2025-12-24", "Jawność w rekrutacji (Kodeks pracy)", "Informacja o wynagrodzeniu dla kandydatów, neutralne płciowo ogłoszenia i nabór, zakaz pytania o historię wynagrodzeń."],
+    ["2026-06-07", "Termin wdrożenia dyrektywy 2023/970", "Prawo pracownika do informacji o średnich wynagrodzeniach w kategorii, dostępne kryteria płac i awansów. Sprawdź aktualny stan polskiej ustawy wdrażającej."],
+    ["2027-06-07", "Pierwsze raporty luki płacowej", "Pracodawcy od 150 pracowników raportują dane za 2026 r. (250+ co roku, 150–249 co 3 lata)."],
+    ["2031-06-07", "Raporty dla firm 100–149 osób", "Pierwszy raport, potem co 3 lata."],
+  ];
+  let nextSet = false;
+  return `<section><h2>Obowiązki i terminy</h2><div class="grid2">
+  <div class="card"><div class="timeline">${TL.map(([d, t, x]) => { const past = new Date(d) <= now; let cls = past ? "past" : ""; if (!past && !nextSet) { cls = "next"; nextSet = true; } return `<div class="tl ${cls}"><span class="d">${d.split("-").reverse().join(".")}</span><b>${t}</b><span class="small muted">${x}</span></div>`; }).join("")}</div></div>
+  <div class="card" style="display:grid;gap:10px;align-content:start"><div class="sec-head"><h3>Twoja firma</h3><span class="chip ${duty.lvl}">${duty.t}</span></div><p>${duty.d}</p>
+  <p class="small"><b>Wspólna ocena wynagrodzeń</b> jest wymagana, gdy raport pokaże w którejś kategorii lukę co najmniej 5%, której nie uzasadniają obiektywne, neutralne płciowo kryteria i która nie zostanie usunięta w ciągu 6 miesięcy.</p>
+  <p class="small"><b>Ciężar dowodu</b> w sprawach o dyskryminację płacową spoczywa na pracodawcy. Dokumentuj wartościowanie i uzasadnienia różnic.</p></div></div></section>
+  <section class="card"><div class="sec-head"><h3>Lista kontrolna gotowości</h3><span class="chip ${Object.values(S.checklist).filter(Boolean).length === CHECK.length ? "ok" : "warn"}">${CHECK.filter(c => S.checklist[c[0]]).length} / ${CHECK.length}</span></div>
+  ${CHECK.map(([id, t, x]) => `<label class="check"><input type="checkbox" data-check="${id}"${S.checklist[id] ? " checked" : ""}><span><b style="font-weight:600">${t}</b><br><span class="small muted">${x}</span></span></label>`).join("")}</section>
+  <p class="small muted">Materiał pomocniczy, nie porada prawna. Terminy według dyrektywy (UE) 2023/970 i nowelizacji Kodeksu pracy z 4.06.2025; szczegóły polskiej ustawy wdrażającą dyrektywę mogą się różnić. Zweryfikuj z prawnikiem.</p>`;
+}
+
+function vUst() {
+  const b = S.company.bands;
+  return `<section><h2>Ustawienia</h2><div class="grid2">
+  <div class="card" style="display:grid;gap:12px;align-content:start"><h3>Firma</h3>
+    <label class="f">Nazwa<input id="sName" value="${esc(S.company.name)}"></label>
+    <label class="f">Liczba pracowników (do obowiązku raportowania)<input id="sHead" type="number" min="0" value="${S.company.headcount}"></label>
+    <label class="f">Narzut ZUS pracodawcy (%)<input id="sZus" type="number" step="0.01" min="0" value="${S.company.zus}"></label>
+    <label class="f">Próg luki (%)<input id="sTh" type="number" step="0.5" min="1" value="${S.company.threshold}"></label></div>
+  <div class="card" style="display:grid;gap:12px;align-content:start"><h3>Granice kategorii (punkty od)</h3>
+    <div class="toolbar">${b.map((v, i) => `<label class="f">${ROMAN[i]}<input type="number" data-band="${i}" value="${v}" style="width:84px"${i === 0 ? " disabled" : ""}></label>`).join("")}</div>
+    <div class="toolbar"><button type="button" id="addBand">+ Kategoria</button><button type="button" id="delBand"${b.length <= 2 ? " disabled" : ""}>− Ostatnia kategoria</button></div>
+    <p class="small muted">Węższe kategorie dają dokładniejsze porównania, ale mniej osób w każdej. Kategoria obejmuje punkty od swojej granicy do granicy następnej.</p></div>
+  <div class="card" style="display:grid;gap:12px;align-content:start"><h3>Wagi kryteriów (maks. punkty)</h3>
+    ${S.criteria.map(c => `<label class="f" style="grid-template-columns:1fr auto;align-items:center">${esc(c.group)}: ${esc(c.name)}<input type="number" min="0" step="5" data-cmax="${c.id}" value="${c.max}" style="width:84px"></label>`).join("")}
+    <p class="small">Suma: <b class="mono">${fmt(maxPoints())}</b> pkt</p></div>
+  <div class="card" style="display:grid;gap:12px;align-content:start"><h3>Dane</h3>
+    <p class="small muted">Dane zapisują się w tym artefakcie po kliknięciu „Zapisz”. Widzą je osoby, którym go udostępnisz. Nie udostępniaj publicznie z prawdziwymi wynagrodzeniami.</p>
+    <div class="toolbar"><button type="button" id="clearSample"${S.sample ? "" : " disabled"}>Oznacz dane jako własne</button>
+    <button type="button" id="resetAsk">Przywróć dane przykładowe</button></div>
+    <div id="resetConfirm" hidden class="banner">Spowoduje to zastąpienie wszystkich danych. <button type="button" id="resetYes" class="primary">Tak, przywróć</button> <button type="button" id="resetNo">Anuluj</button></div></div>
+  </div></section>`;
+}
+
+const VIEWS = { pulpit: vPulpit, wartosciowanie: vWart, kategorie: vKat, pracownicy: vPrac, widelki: vWid, symulacja: vSym, obowiazki: vObow, ustawienia: vUst };
+function render() { renderTabs(); $("#view").innerHTML = VIEWS[tab](); }
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 2600); }
+function setDirty(v = true) { dirty = v; const s = $("#saveState"); s.textContent = readOnly ? "Tylko do odczytu" : v ? "Niezapisane zmiany" : "Zapisano"; s.className = "save-state" + (v ? " dirty" : ""); $("#btnSave").disabled = readOnly || !artifactNs || !v; try { if (v) sessionStorage.setItem("rp-draft", JSON.stringify(S)); else sessionStorage.removeItem("rp-draft"); } catch (e) {} }
+function change() { setDirty(true); render(); }
+
+// ---------- zdarzenia ----------
+document.addEventListener("click", async ev => {
+  const t = ev.target.closest("button, [data-tab]"); if (!t) return;
+  if (t.dataset.tab) { tab = t.dataset.tab; try { localStorage.setItem("rp-tab", tab); } catch (e) {} render(); window.scrollTo(0, 0); return; }
+  if (t.id === "btnSave") return save();
+  if (t.id === "btnExport") return exportCsv();
+  if (t.id === "addPos") { const id = "s" + Date.now().toString(36); S.positions.push({ id, name: "Nowe stanowisko", dept: "", levels: Object.fromEntries(S.criteria.map(c => [c.id, 3])) }); return change(); }
+  if (t.dataset.delPos) { const id = t.dataset.delPos; const n = S.employees.filter(e => e.pos === id).length; if (n) { toast(`Najpierw przenieś ${n} os. na inne stanowisko`); return; } S.positions = S.positions.filter(p => p.id !== id); return change(); }
+  if (t.id === "addEmp") { const n = S.employees.length + 1; let id = "P-" + String(n).padStart(3, "0"); while (S.employees.some(e => e.id === id)) id += "a"; S.employees.unshift({ id, pos: S.positions[0]?.id, sex: "K", base: 7000, variable: 0, fte: 1, tenure: 0 }); filt = { cat: "", sex: "", q: "" }; return change(); }
+  if (t.dataset.delEmp) { S.employees = S.employees.filter(e => e.id !== t.dataset.delEmp); return change(); }
+  if (t.id === "csvTpl") { copy("id;stanowisko;plec;zasadnicze;zmienne;etat;staz\nP-001;Księgowy / Księgowa;K;8600;300;1;4.5\nP-002;Magazynier / Magazynierka;M;5800;350;1;2"); return; }
+  if (t.dataset.copy) return copy(t.dataset.copy);
+  if (t.id === "addBand") { const b = S.company.bands; b.push(b[b.length - 1] + 100); return change(); }
+  if (t.id === "delBand") { S.company.bands.pop(); return change(); }
+  if (t.id === "clearSample") { S.sample = false; return change(); }
+  if (t.id === "resetAsk") { $("#resetConfirm").hidden = false; return; }
+  if (t.id === "resetNo") { $("#resetConfirm").hidden = true; return; }
+  if (t.id === "resetYes") { S = JSON.parse(JSON.stringify(SEED)); return change(); }
+});
+document.addEventListener("change", ev => {
+  const t = ev.target, d = t.dataset;
+  if (t.id === "payBasis") { payBasis = t.value; return render(); }
+  if (t.id === "simBasis") { sim.basis = t.value; return render(); }
+  if (t.id === "rangeMethod") { rangeMethod = t.value; return render(); }
+  if (t.id === "fcat") { filt.cat = t.value; return render(); }
+  if (t.id === "fsex") { filt.sex = t.value; return render(); }
+  if (t.id === "csvIn") return importCsv(t.files[0]);
+  if (d.lvl) { posById(d.lvl).levels[d.crit] = Number(t.value); return change(); }
+  if (d.posName) { posById(d.posName).name = t.value.trim() || "Bez nazwy"; return change(); }
+  if (d.posDept) { posById(d.posDept).dept = t.value.trim(); return change(); }
+  if (d.emp) { const e = S.employees.find(x => x.id === d.emp); if (!e) return; const f = d.f; let v = t.value;
+    if (f === "id") { v = v.trim(); if (!v || S.employees.some(x => x !== e && x.id === v)) { toast("Identyfikator musi być unikalny"); return render(); } }
+    if (["base", "variable", "fte", "tenure"].includes(f)) { v = Number(v); if (f === "fte" && !(v > 0 && v <= 1)) { toast("Etat: od 0,05 do 1"); return render(); } if (!(v >= 0)) v = 0; }
+    e[f] = v; return change(); }
+  if (d.noteStatus != null) { (S.notes[d.noteStatus] ||= {}).status = t.value; return change(); }
+  if (d.noteText != null) { (S.notes[d.noteText] ||= {}).text = t.value; setDirty(true); return; }
+  if (d.check) { S.checklist[d.check] = t.checked; return change(); }
+  if (t.id === "sName") { S.company.name = t.value; return change(); }
+  if (t.id === "sHead") { S.company.headcount = Number(t.value) || 0; return change(); }
+  if (t.id === "sZus") { S.company.zus = Number(t.value) || 0; return change(); }
+  if (t.id === "sTh") { S.company.threshold = Math.max(1, Number(t.value) || 5); return change(); }
+  if (d.cmax) { S.criteria.find(c => c.id === d.cmax).max = Math.max(0, Number(t.value) || 0); return change(); }
+  if (d.band) { const i = Number(d.band), b = S.company.bands, v = Number(t.value); if (!(v > b[i - 1]) || (b[i + 1] != null && v >= b[i + 1])) { toast("Granice muszą rosnąć"); return render(); } b[i] = v; return change(); }
+});
+document.addEventListener("input", ev => {
+  const t = ev.target;
+  if (t.id === "tol") { sim.tol = Number(t.value); $("#tolOut").textContent = fmt(sim.tol, 1) + "%"; clearTimeout(vSym.h); vSym.h = setTimeout(() => { const y = window.scrollY; render(); window.scrollTo(0, y); const r = $("#tol"); r && r.focus(); }, 120); }
+  if (t.id === "fq") { filt.q = t.value; clearTimeout(vPrac.h); vPrac.h = setTimeout(() => { render(); const q = $("#fq"); q.focus(); q.setSelectionRange(q.value.length, q.value.length); }, 250); }
+});
+window.addEventListener("beforeunload", e => { if (dirty && !readOnly) { e.preventDefault(); e.returnValue = ""; } });
+
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast("Skopiowano"); }
+  catch (e) { const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); toast("Skopiowano"); } catch (x) { toast("Zaznacz tekst i skopiuj ręcznie"); } ta.remove(); }
+}
+
+function parseCsv(txt) {
+  txt = txt.replace(/^﻿/, "");
+  const lines = txt.split(/\r?\n/).filter(l => l.trim());
+  const sep = (lines[0].match(/;/g) || []).length >= (lines[0].match(/,/g) || []).length ? ";" : ",";
+  const split = l => { const out = []; let cur = "", q = false; for (const ch of l) { if (ch === '"') q = !q; else if (ch === sep && !q) { out.push(cur); cur = ""; } else cur += ch; } out.push(cur); return out.map(s => s.trim()); };
+  return lines.map(split);
+}
+function importCsv(file) {
+  if (!file) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const rows = parseCsv(String(rd.result));
+      const head = rows[0].map(h => h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace("ł", "l"));
+      const col = (...names) => head.findIndex(h => names.some(n => h.startsWith(n)));
+      const ci = { id: col("id"), pos: col("stanowisko", "position"), sex: col("plec", "sex", "gender"), base: col("zasadnicze", "base", "pensja"), variable: col("zmienne", "premia", "variable"), fte: col("etat", "fte"), tenure: col("staz", "tenure") };
+      if (ci.pos < 0 || ci.sex < 0 || ci.base < 0) { toast("Brak wymaganych kolumn: stanowisko, plec, zasadnicze"); return; }
+      const num = s => Number(String(s ?? "").replace(/\s/g, "").replace(",", ".")) || 0;
+      const emps = []; let added = 0;
+      rows.slice(1).forEach((r, k) => {
+        const pname = r[ci.pos]; if (!pname) return;
+        let p = S.positions.find(x => x.name.toLowerCase() === pname.toLowerCase());
+        if (!p) { p = { id: "s" + Date.now().toString(36) + k, name: pname, dept: "", levels: Object.fromEntries(S.criteria.map(c => [c.id, 3])) }; S.positions.push(p); added++; }
+        const sx = String(r[ci.sex] || "").trim().toUpperCase().startsWith("M") ? "M" : "K";
+        const fte = ci.fte >= 0 ? num(r[ci.fte]) : 1;
+        emps.push({ id: (ci.id >= 0 && r[ci.id]) || "P-" + String(k + 1).padStart(3, "0"), pos: p.id, sex: sx, base: num(r[ci.base]), variable: ci.variable >= 0 ? num(r[ci.variable]) : 0, fte: fte > 0 && fte <= 1 ? fte : 1, tenure: ci.tenure >= 0 ? num(r[ci.tenure]) : 0 });
+      });
+      if (!emps.length) { toast("Plik nie zawiera wierszy z danymi"); return; }
+      S.employees = emps; S.sample = false;
+      change(); toast(`Wczytano ${emps.length} osób` + (added ? `, nowe stanowiska: ${added}. Oceń je w Wartościowaniu.` : ""));
+    } catch (e) { toast("Nie udało się odczytać pliku CSV"); }
+  };
+  rd.readAsText(file, "utf-8");
+}
+
+async function exportCsv() {
+  const st = catStats(), q = quartiles();
+  const L = [], c = v => { const s = String(v ?? ""); return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const n2 = v => isFinite(v) ? v.toFixed(2).replace(".", ",") : "";
+  L.push(["Raport luki płacowej", S.company.name, new Date().toLocaleDateString("pl-PL"), payBasis === "total" ? "wynagrodzenie całkowite" : "zasadnicze"]);
+  L.push([]); L.push(["Ogółem", "luka średnia %", n2(gapOf(S.employees)), "luka mediana %", n2(gapOf(S.employees, payBasis, median))]);
+  L.push([]); L.push(["Kwartyl", "K", "M", "% K", "od zł", "do zł"]);
+  q.forEach((r, i) => L.push(["Q" + (i + 1), r.k, r.m, n2(r.k / ((r.k + r.m) || 1) * 100), n2(r.lo), n2(r.hi)]));
+  L.push([]); L.push(["Kategoria", "punkty", "stanowiska", "K", "M", "średnia K", "średnia M", "luka średnia %", "luka mediana %", "luka zasadnicze %", "status", "uzasadnienie"]);
+  st.forEach(s => { const note = S.notes[s.i] || {}; L.push([ROMAN[s.i], catLabel(s.i).split(" · ")[1], s.pos.map(p => p.name).join(" | "), s.K.length, s.M.length, n2(s.meanK), n2(s.meanM), n2(s.g), n2(s.gm), n2(s.gb), note.status || "", note.text || ""]); });
+  L.push([]); L.push(["Stanowisko", "dział", ...S.criteria.map(x => x.name), "punkty", "kategoria"]);
+  S.positions.forEach(p => L.push([p.name, p.dept, ...S.criteria.map(x => p.levels[x.id]), points(p), ROMAN[catOf(points(p))]]));
+  const csv = "﻿" + L.map(r => r.map(c).join(";")).join("\r\n");
+  if (!downloadsNs) { copy(csv); toast("Pobieranie niedostępne: raport skopiowano do schowka"); return; }
+  try { await downloadsNs.save({ filename: "raport-luki-placowej.csv", data: csv }); }
+  catch (e) { if (e && e.code === "declined") return; if (e && e.code === "rate_limited") { toast("Poczekaj chwilę i spróbuj ponownie"); return; } toast("Nie udało się zapisać pliku"); }
+}
+
+async function save() {
+  if (!artifactNs || readOnly) return;
+  const btn = $("#btnSave"); btn.disabled = true; $("#saveState").textContent = "Zapisywanie…";
+  try {
+    await artifactNs.publish({ "data.json": JSON.stringify(S, null, 1) });
+    setDirty(false); toast("Zapisano");
+  } catch (e) {
+    const code = e && e.code;
+    if (code === "conflict") { $("#saveState").textContent = "Ktoś zapisał wcześniej, wczytuję nowszą wersję"; return; }
+    if (["not_writer", "not_granted", "consent_required", "capability_disabled", "capability_removed", "not_declared"].includes(code)) { readOnly = true; setDirty(dirty); toast("Ten widok jest tylko do odczytu, zapis niedostępny"); return; }
+    if (code === "rate_limited") { toast("Zbyt częste zapisy, spróbuj za chwilę"); setDirty(true); return; }
+    toast("Zapis się nie udał, spróbuj ponownie"); setDirty(true);
+  }
+}
+
+async function boot() {
+  let data = null;
+  try { const r = await fetch("data.json", { cache: "no-store" }); if (r.ok) data = await r.json(); } catch (e) {}
+  S = data && data.employees ? data : JSON.parse(JSON.stringify(SEED));
+  S.notes ||= {}; S.checklist ||= {};
+  let restored = false;
+  try { const d = sessionStorage.getItem("rp-draft"); if (d) { S = JSON.parse(d); restored = true; } } catch (e) {}
+  render(); setDirty(restored);
+  if (restored) toast("Przywrócono niezapisane zmiany");
+  if (window.claude && window.claude.use) {
+    window.claude.use("artifact").then(a => { artifactNs = a; if (!a) { readOnly = true; } setDirty(dirty); }).catch(() => { readOnly = true; setDirty(dirty); });
+    window.claude.use("downloads").then(d => { downloadsNs = d; }).catch(() => {});
+  } else { readOnly = true; setDirty(dirty); }
+}
+boot();
+})();
+</script>

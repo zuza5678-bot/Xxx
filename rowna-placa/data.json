@@ -1,0 +1,1044 @@
+{
+ "version": 1,
+ "sample": true,
+ "company": {
+  "name": "Przykładowa Sp. z o.o.",
+  "headcount": 182,
+  "zus": 20.48,
+  "threshold": 5,
+  "bands": [
+   0,
+   400,
+   500,
+   600,
+   700,
+   800
+  ]
+ },
+ "criteria": [
+  {
+   "id": "wiedza",
+   "group": "Umiejętności",
+   "name": "Wiedza i wykształcenie",
+   "max": 150,
+   "desc": "Poziom wiedzy specjalistycznej i kwalifikacji wymaganych na stanowisku."
+  },
+  {
+   "id": "doswiadczenie",
+   "group": "Umiejętności",
+   "name": "Doświadczenie",
+   "max": 100,
+   "desc": "Okres praktyki potrzebny do samodzielnej pracy."
+  },
+  {
+   "id": "interpersonalne",
+   "group": "Umiejętności",
+   "name": "Umiejętności interpersonalne",
+   "max": 100,
+   "desc": "Komunikacja, negocjacje, obsługa trudnych rozmów, empatia."
+  },
+  {
+   "id": "umyslowy",
+   "group": "Wysiłek",
+   "name": "Wysiłek umysłowy",
+   "max": 100,
+   "desc": "Złożoność problemów, koncentracja, analiza."
+  },
+  {
+   "id": "fizyczny",
+   "group": "Wysiłek",
+   "name": "Wysiłek fizyczny",
+   "max": 50,
+   "desc": "Dźwiganie, praca w ruchu, pozycja wymuszona."
+  },
+  {
+   "id": "ludzie",
+   "group": "Odpowiedzialność",
+   "name": "Za ludzi",
+   "max": 150,
+   "desc": "Kierowanie, koordynacja i rozwój innych osób."
+  },
+  {
+   "id": "zasoby",
+   "group": "Odpowiedzialność",
+   "name": "Za finanse i zasoby",
+   "max": 100,
+   "desc": "Budżet, mienie, sprzęt, dane."
+  },
+  {
+   "id": "decyzje",
+   "group": "Odpowiedzialność",
+   "name": "Za decyzje i ich skutki",
+   "max": 100,
+   "desc": "Wpływ błędu na klienta, firmę, bezpieczeństwo."
+  },
+  {
+   "id": "srodowisko",
+   "group": "Warunki pracy",
+   "name": "Środowisko pracy",
+   "max": 75,
+   "desc": "Hałas, temperatura, zmianowość, zagrożenia."
+  },
+  {
+   "id": "psychiczne",
+   "group": "Warunki pracy",
+   "name": "Obciążenie psychiczne",
+   "max": 75,
+   "desc": "Presja czasu, kontakt z trudnym klientem, stres."
+  }
+ ],
+ "positions": [
+  {
+   "id": "s01",
+   "name": "Specjalista / Specjalistka ds. obsługi klienta",
+   "dept": "Obsługa klienta",
+   "levels": {
+    "wiedza": 2,
+    "doswiadczenie": 2,
+    "interpersonalne": 4,
+    "umyslowy": 2,
+    "fizyczny": 1,
+    "ludzie": 1,
+    "zasoby": 1,
+    "decyzje": 2,
+    "srodowisko": 2,
+    "psychiczne": 4
+   }
+  },
+  {
+   "id": "s02",
+   "name": "Magazynier / Magazynierka",
+   "dept": "Logistyka",
+   "levels": {
+    "wiedza": 1,
+    "doswiadczenie": 2,
+    "interpersonalne": 1,
+    "umyslowy": 1,
+    "fizyczny": 5,
+    "ludzie": 1,
+    "zasoby": 2,
+    "decyzje": 2,
+    "srodowisko": 4,
+    "psychiczne": 2
+   }
+  },
+  {
+   "id": "s03",
+   "name": "Operator / Operatorka wózka widłowego",
+   "dept": "Logistyka",
+   "levels": {
+    "wiedza": 2,
+    "doswiadczenie": 2,
+    "interpersonalne": 1,
+    "umyslowy": 2,
+    "fizyczny": 4,
+    "ludzie": 1,
+    "zasoby": 3,
+    "decyzje": 3,
+    "srodowisko": 4,
+    "psychiczne": 2
+   }
+  },
+  {
+   "id": "s04",
+   "name": "Księgowy / Księgowa",
+   "dept": "Finanse",
+   "levels": {
+    "wiedza": 4,
+    "doswiadczenie": 3,
+    "interpersonalne": 2,
+    "umyslowy": 4,
+    "fizyczny": 1,
+    "ludzie": 1,
+    "zasoby": 4,
+    "decyzje": 3,
+    "srodowisko": 1,
+    "psychiczne": 3
+   }
+  },
+  {
+   "id": "s05",
+   "name": "Specjalista / Specjalistka ds. kadr i płac",
+   "dept": "HR",
+   "levels": {
+    "wiedza": 4,
+    "doswiadczenie": 3,
+    "interpersonalne": 4,
+    "umyslowy": 3,
+    "fizyczny": 1,
+    "ludzie": 1,
+    "zasoby": 3,
+    "decyzje": 3,
+    "srodowisko": 1,
+    "psychiczne": 3
+   }
+  },
+  {
+   "id": "s06",
+   "name": "Programista / Programistka",
+   "dept": "IT",
+   "levels": {
+    "wiedza": 5,
+    "doswiadczenie": 3,
+    "interpersonalne": 2,
+    "umyslowy": 5,
+    "fizyczny": 1,
+    "ludzie": 1,
+    "zasoby": 2,
+    "decyzje": 3,
+    "srodowisko": 1,
+    "psychiczne": 3
+   }
+  },
+  {
+   "id": "s07",
+   "name": "Tester / Testerka QA",
+   "dept": "IT",
+   "levels": {
+    "wiedza": 4,
+    "doswiadczenie": 3,
+    "interpersonalne": 2,
+    "umyslowy": 4,
+    "fizyczny": 1,
+    "ludzie": 1,
+    "zasoby": 1,
+    "decyzje": 3,
+    "srodowisko": 1,
+    "psychiczne": 3
+   }
+  },
+  {
+   "id": "s08",
+   "name": "Handlowiec B2B",
+   "dept": "Sprzedaż",
+   "levels": {
+    "wiedza": 3,
+    "doswiadczenie": 3,
+    "interpersonalne": 5,
+    "umyslowy": 3,
+    "fizyczny": 2,
+    "ludzie": 1,
+    "zasoby": 4,
+    "decyzje": 3,
+    "srodowisko": 2,
+    "psychiczne": 4
+   }
+  },
+  {
+   "id": "s09",
+   "name": "Koordynator / Koordynatorka logistyki",
+   "dept": "Logistyka",
+   "levels": {
+    "wiedza": 3,
+    "doswiadczenie": 4,
+    "interpersonalne": 3,
+    "umyslowy": 3,
+    "fizyczny": 2,
+    "ludzie": 3,
+    "zasoby": 3,
+    "decyzje": 3,
+    "srodowisko": 2,
+    "psychiczne": 4
+   }
+  },
+  {
+   "id": "s10",
+   "name": "Kierownik / Kierowniczka zmiany",
+   "dept": "Produkcja",
+   "levels": {
+    "wiedza": 3,
+    "doswiadczenie": 4,
+    "interpersonalne": 4,
+    "umyslowy": 3,
+    "fizyczny": 3,
+    "ludzie": 4,
+    "zasoby": 3,
+    "decyzje": 4,
+    "srodowisko": 3,
+    "psychiczne": 4
+   }
+  },
+  {
+   "id": "s11",
+   "name": "Pracownik / Pracownica produkcji",
+   "dept": "Produkcja",
+   "levels": {
+    "wiedza": 1,
+    "doswiadczenie": 1,
+    "interpersonalne": 1,
+    "umyslowy": 2,
+    "fizyczny": 5,
+    "ludzie": 1,
+    "zasoby": 2,
+    "decyzje": 2,
+    "srodowisko": 4,
+    "psychiczne": 3
+   }
+  },
+  {
+   "id": "s12",
+   "name": "Asystent / Asystentka zarządu",
+   "dept": "Zarząd",
+   "levels": {
+    "wiedza": 3,
+    "doswiadczenie": 3,
+    "interpersonalne": 4,
+    "umyslowy": 2,
+    "fizyczny": 1,
+    "ludzie": 1,
+    "zasoby": 2,
+    "decyzje": 2,
+    "srodowisko": 1,
+    "psychiczne": 3
+   }
+  },
+  {
+   "id": "s13",
+   "name": "Kierownik / Kierowniczka działu finansów",
+   "dept": "Finanse",
+   "levels": {
+    "wiedza": 5,
+    "doswiadczenie": 5,
+    "interpersonalne": 4,
+    "umyslowy": 4,
+    "fizyczny": 1,
+    "ludzie": 5,
+    "zasoby": 5,
+    "decyzje": 5,
+    "srodowisko": 1,
+    "psychiczne": 4
+   }
+  },
+  {
+   "id": "s14",
+   "name": "Analityk / Analityczka danych",
+   "dept": "IT",
+   "levels": {
+    "wiedza": 5,
+    "doswiadczenie": 3,
+    "interpersonalne": 3,
+    "umyslowy": 5,
+    "fizyczny": 1,
+    "ludzie": 1,
+    "zasoby": 2,
+    "decyzje": 4,
+    "srodowisko": 1,
+    "psychiczne": 3
+   }
+  }
+ ],
+ "employees": [
+  {
+   "id": "P-001",
+   "pos": "s01",
+   "sex": "K",
+   "base": 3050,
+   "variable": 200,
+   "fte": 0.5,
+   "tenure": 2.1
+  },
+  {
+   "id": "P-002",
+   "pos": "s01",
+   "sex": "K",
+   "base": 7150,
+   "variable": 350,
+   "fte": 1.0,
+   "tenure": 12.6
+  },
+  {
+   "id": "P-003",
+   "pos": "s01",
+   "sex": "K",
+   "base": 7050,
+   "variable": 350,
+   "fte": 1.0,
+   "tenure": 8.2
+  },
+  {
+   "id": "P-004",
+   "pos": "s01",
+   "sex": "K",
+   "base": 4750,
+   "variable": 150,
+   "fte": 0.75,
+   "tenure": 6.5
+  },
+  {
+   "id": "P-005",
+   "pos": "s01",
+   "sex": "K",
+   "base": 6600,
+   "variable": 350,
+   "fte": 1.0,
+   "tenure": 11.5
+  },
+  {
+   "id": "P-006",
+   "pos": "s01",
+   "sex": "K",
+   "base": 6550,
+   "variable": 250,
+   "fte": 1.0,
+   "tenure": 3.3
+  },
+  {
+   "id": "P-007",
+   "pos": "s01",
+   "sex": "M",
+   "base": 7500,
+   "variable": 350,
+   "fte": 1.0,
+   "tenure": 13.0
+  },
+  {
+   "id": "P-008",
+   "pos": "s01",
+   "sex": "M",
+   "base": 5700,
+   "variable": 300,
+   "fte": 1.0,
+   "tenure": 5.1
+  },
+  {
+   "id": "P-009",
+   "pos": "s02",
+   "sex": "K",
+   "base": 4600,
+   "variable": 300,
+   "fte": 0.75,
+   "tenure": 6.7
+  },
+  {
+   "id": "P-010",
+   "pos": "s02",
+   "sex": "M",
+   "base": 5750,
+   "variable": 300,
+   "fte": 1.0,
+   "tenure": 5.4
+  },
+  {
+   "id": "P-011",
+   "pos": "s02",
+   "sex": "M",
+   "base": 6050,
+   "variable": 350,
+   "fte": 1.0,
+   "tenure": 8.4
+  },
+  {
+   "id": "P-012",
+   "pos": "s02",
+   "sex": "M",
+   "base": 6200,
+   "variable": 350,
+   "fte": 1.0,
+   "tenure": 8.6
+  },
+  {
+   "id": "P-013",
+   "pos": "s02",
+   "sex": "M",
+   "base": 5450,
+   "variable": 300,
+   "fte": 1.0,
+   "tenure": 4.0
+  },
+  {
+   "id": "P-014",
+   "pos": "s02",
+   "sex": "M",
+   "base": 5850,
+   "variable": 250,
+   "fte": 1.0,
+   "tenure": 0.8
+  },
+  {
+   "id": "P-015",
+   "pos": "s02",
+   "sex": "M",
+   "base": 5550,
+   "variable": 200,
+   "fte": 1.0,
+   "tenure": 1.2
+  },
+  {
+   "id": "P-016",
+   "pos": "s03",
+   "sex": "M",
+   "base": 7350,
+   "variable": 400,
+   "fte": 1.0,
+   "tenure": 6.8
+  },
+  {
+   "id": "P-017",
+   "pos": "s03",
+   "sex": "M",
+   "base": 8150,
+   "variable": 450,
+   "fte": 1.0,
+   "tenure": 12.5
+  },
+  {
+   "id": "P-018",
+   "pos": "s03",
+   "sex": "M",
+   "base": 8250,
+   "variable": 500,
+   "fte": 1.0,
+   "tenure": 13.8
+  },
+  {
+   "id": "P-019",
+   "pos": "s03",
+   "sex": "M",
+   "base": 7950,
+   "variable": 450,
+   "fte": 1.0,
+   "tenure": 9.5
+  },
+  {
+   "id": "P-020",
+   "pos": "s03",
+   "sex": "M",
+   "base": 8900,
+   "variable": 500,
+   "fte": 1.0,
+   "tenure": 12.4
+  },
+  {
+   "id": "P-021",
+   "pos": "s04",
+   "sex": "K",
+   "base": 9450,
+   "variable": 400,
+   "fte": 1.0,
+   "tenure": 4.1
+  },
+  {
+   "id": "P-022",
+   "pos": "s04",
+   "sex": "K",
+   "base": 9500,
+   "variable": 350,
+   "fte": 1.0,
+   "tenure": 7.6
+  },
+  {
+   "id": "P-023",
+   "pos": "s04",
+   "sex": "K",
+   "base": 8650,
+   "variable": 400,
+   "fte": 1.0,
+   "tenure": 4.0
+  },
+  {
+   "id": "P-024",
+   "pos": "s04",
+   "sex": "K",
+   "base": 9450,
+   "variable": 450,
+   "fte": 1.0,
+   "tenure": 8.0
+  },
+  {
+   "id": "P-025",
+   "pos": "s04",
+   "sex": "K",
+   "base": 9200,
+   "variable": 400,
+   "fte": 1.0,
+   "tenure": 4.8
+  },
+  {
+   "id": "P-026",
+   "pos": "s04",
+   "sex": "M",
+   "base": 9300,
+   "variable": 350,
+   "fte": 1.0,
+   "tenure": 7.5
+  },
+  {
+   "id": "P-027",
+   "pos": "s05",
+   "sex": "K",
+   "base": 9750,
+   "variable": 250,
+   "fte": 1.0,
+   "tenure": 13.6
+  },
+  {
+   "id": "P-028",
+   "pos": "s05",
+   "sex": "K",
+   "base": 8600,
+   "variable": 250,
+   "fte": 1.0,
+   "tenure": 7.2
+  },
+  {
+   "id": "P-029",
+   "pos": "s05",
+   "sex": "K",
+   "base": 8750,
+   "variable": 200,
+   "fte": 1.0,
+   "tenure": 6.1
+  },
+  {
+   "id": "P-030",
+   "pos": "s05",
+   "sex": "K",
+   "base": 9500,
+   "variable": 250,
+   "fte": 1.0,
+   "tenure": 13.1
+  },
+  {
+   "id": "P-031",
+   "pos": "s05",
+   "sex": "M",
+   "base": 8200,
+   "variable": 400,
+   "fte": 1.0,
+   "tenure": 3.8
+  },
+  {
+   "id": "P-032",
+   "pos": "s06",
+   "sex": "K",
+   "base": 12950,
+   "variable": 450,
+   "fte": 1.0,
+   "tenure": 9.1
+  },
+  {
+   "id": "P-033",
+   "pos": "s06",
+   "sex": "M",
+   "base": 15000,
+   "variable": 700,
+   "fte": 1.0,
+   "tenure": 8.4
+  },
+  {
+   "id": "P-034",
+   "pos": "s06",
+   "sex": "M",
+   "base": 12700,
+   "variable": 500,
+   "fte": 1.0,
+   "tenure": 2.3
+  },
+  {
+   "id": "P-035",
+   "pos": "s06",
+   "sex": "M",
+   "base": 16150,
+   "variable": 550,
+   "fte": 1.0,
+   "tenure": 13.4
+  },
+  {
+   "id": "P-036",
+   "pos": "s06",
+   "sex": "M",
+   "base": 15150,
+   "variable": 850,
+   "fte": 1.0,
+   "tenure": 13.1
+  },
+  {
+   "id": "P-037",
+   "pos": "s06",
+   "sex": "M",
+   "base": 13450,
+   "variable": 650,
+   "fte": 1.0,
+   "tenure": 4.6
+  },
+  {
+   "id": "P-038",
+   "pos": "s06",
+   "sex": "M",
+   "base": 14050,
+   "variable": 450,
+   "fte": 1.0,
+   "tenure": 0.7
+  },
+  {
+   "id": "P-039",
+   "pos": "s07",
+   "sex": "K",
+   "base": 5800,
+   "variable": 250,
+   "fte": 0.75,
+   "tenure": 1.2
+  },
+  {
+   "id": "P-040",
+   "pos": "s07",
+   "sex": "K",
+   "base": 8450,
+   "variable": 250,
+   "fte": 1.0,
+   "tenure": 4.9
+  },
+  {
+   "id": "P-041",
+   "pos": "s07",
+   "sex": "M",
+   "base": 8550,
+   "variable": 400,
+   "fte": 1.0,
+   "tenure": 2.1
+  },
+  {
+   "id": "P-042",
+   "pos": "s07",
+   "sex": "M",
+   "base": 8600,
+   "variable": 300,
+   "fte": 1.0,
+   "tenure": 7.5
+  },
+  {
+   "id": "P-043",
+   "pos": "s08",
+   "sex": "K",
+   "base": 9500,
+   "variable": 2000,
+   "fte": 1.0,
+   "tenure": 8.6
+  },
+  {
+   "id": "P-044",
+   "pos": "s08",
+   "sex": "K",
+   "base": 9850,
+   "variable": 1500,
+   "fte": 1.0,
+   "tenure": 12.9
+  },
+  {
+   "id": "P-045",
+   "pos": "s08",
+   "sex": "M",
+   "base": 9700,
+   "variable": 2000,
+   "fte": 1.0,
+   "tenure": 11.8
+  },
+  {
+   "id": "P-046",
+   "pos": "s08",
+   "sex": "M",
+   "base": 10500,
+   "variable": 2050,
+   "fte": 1.0,
+   "tenure": 12.4
+  },
+  {
+   "id": "P-047",
+   "pos": "s08",
+   "sex": "M",
+   "base": 9300,
+   "variable": 1850,
+   "fte": 1.0,
+   "tenure": 11.1
+  },
+  {
+   "id": "P-048",
+   "pos": "s08",
+   "sex": "M",
+   "base": 9550,
+   "variable": 2400,
+   "fte": 1.0,
+   "tenure": 5.8
+  },
+  {
+   "id": "P-049",
+   "pos": "s09",
+   "sex": "K",
+   "base": 9200,
+   "variable": 450,
+   "fte": 1.0,
+   "tenure": 1.6
+  },
+  {
+   "id": "P-050",
+   "pos": "s09",
+   "sex": "K",
+   "base": 10650,
+   "variable": 550,
+   "fte": 1.0,
+   "tenure": 11.0
+  },
+  {
+   "id": "P-051",
+   "pos": "s09",
+   "sex": "M",
+   "base": 10200,
+   "variable": 700,
+   "fte": 1.0,
+   "tenure": 4.9
+  },
+  {
+   "id": "P-052",
+   "pos": "s09",
+   "sex": "M",
+   "base": 11150,
+   "variable": 800,
+   "fte": 1.0,
+   "tenure": 11.5
+  },
+  {
+   "id": "P-053",
+   "pos": "s10",
+   "sex": "K",
+   "base": 13050,
+   "variable": 1150,
+   "fte": 1.0,
+   "tenure": 13.4
+  },
+  {
+   "id": "P-054",
+   "pos": "s10",
+   "sex": "M",
+   "base": 12350,
+   "variable": 1300,
+   "fte": 1.0,
+   "tenure": 12.0
+  },
+  {
+   "id": "P-055",
+   "pos": "s10",
+   "sex": "M",
+   "base": 12200,
+   "variable": 1200,
+   "fte": 1.0,
+   "tenure": 5.3
+  },
+  {
+   "id": "P-056",
+   "pos": "s10",
+   "sex": "M",
+   "base": 11900,
+   "variable": 1300,
+   "fte": 1.0,
+   "tenure": 2.0
+  },
+  {
+   "id": "P-057",
+   "pos": "s11",
+   "sex": "K",
+   "base": 5700,
+   "variable": 250,
+   "fte": 1.0,
+   "tenure": 8.2
+  },
+  {
+   "id": "P-058",
+   "pos": "s11",
+   "sex": "K",
+   "base": 5400,
+   "variable": 250,
+   "fte": 1.0,
+   "tenure": 1.9
+  },
+  {
+   "id": "P-059",
+   "pos": "s11",
+   "sex": "K",
+   "base": 5200,
+   "variable": 350,
+   "fte": 1.0,
+   "tenure": 2.8
+  },
+  {
+   "id": "P-060",
+   "pos": "s11",
+   "sex": "K",
+   "base": 5400,
+   "variable": 300,
+   "fte": 1.0,
+   "tenure": 9.0
+  },
+  {
+   "id": "P-061",
+   "pos": "s11",
+   "sex": "M",
+   "base": 6000,
+   "variable": 300,
+   "fte": 1.0,
+   "tenure": 11.8
+  },
+  {
+   "id": "P-062",
+   "pos": "s11",
+   "sex": "M",
+   "base": 5850,
+   "variable": 450,
+   "fte": 1.0,
+   "tenure": 6.1
+  },
+  {
+   "id": "P-063",
+   "pos": "s11",
+   "sex": "M",
+   "base": 5800,
+   "variable": 200,
+   "fte": 1.0,
+   "tenure": 6.1
+  },
+  {
+   "id": "P-064",
+   "pos": "s11",
+   "sex": "M",
+   "base": 5950,
+   "variable": 350,
+   "fte": 1.0,
+   "tenure": 9.8
+  },
+  {
+   "id": "P-065",
+   "pos": "s11",
+   "sex": "M",
+   "base": 5700,
+   "variable": 350,
+   "fte": 1.0,
+   "tenure": 5.2
+  },
+  {
+   "id": "P-066",
+   "pos": "s11",
+   "sex": "M",
+   "base": 5850,
+   "variable": 300,
+   "fte": 1.0,
+   "tenure": 13.0
+  },
+  {
+   "id": "P-067",
+   "pos": "s11",
+   "sex": "M",
+   "base": 6150,
+   "variable": 400,
+   "fte": 1.0,
+   "tenure": 6.7
+  },
+  {
+   "id": "P-068",
+   "pos": "s11",
+   "sex": "M",
+   "base": 5850,
+   "variable": 450,
+   "fte": 1.0,
+   "tenure": 9.7
+  },
+  {
+   "id": "P-069",
+   "pos": "s12",
+   "sex": "K",
+   "base": 5550,
+   "variable": 150,
+   "fte": 0.75,
+   "tenure": 13.3
+  },
+  {
+   "id": "P-070",
+   "pos": "s12",
+   "sex": "K",
+   "base": 7250,
+   "variable": 300,
+   "fte": 1.0,
+   "tenure": 4.4
+  },
+  {
+   "id": "P-071",
+   "pos": "s12",
+   "sex": "K",
+   "base": 6800,
+   "variable": 250,
+   "fte": 1.0,
+   "tenure": 2.2
+  },
+  {
+   "id": "P-072",
+   "pos": "s13",
+   "sex": "K",
+   "base": 17100,
+   "variable": 2050,
+   "fte": 1.0,
+   "tenure": 5.1
+  },
+  {
+   "id": "P-073",
+   "pos": "s13",
+   "sex": "M",
+   "base": 17700,
+   "variable": 1450,
+   "fte": 1.0,
+   "tenure": 2.0
+  },
+  {
+   "id": "P-074",
+   "pos": "s13",
+   "sex": "M",
+   "base": 9600,
+   "variable": 1200,
+   "fte": 0.5,
+   "tenure": 9.2
+  },
+  {
+   "id": "P-075",
+   "pos": "s14",
+   "sex": "K",
+   "base": 11750,
+   "variable": 550,
+   "fte": 1.0,
+   "tenure": 5.3
+  },
+  {
+   "id": "P-076",
+   "pos": "s14",
+   "sex": "K",
+   "base": 11750,
+   "variable": 600,
+   "fte": 1.0,
+   "tenure": 2.2
+  },
+  {
+   "id": "P-077",
+   "pos": "s14",
+   "sex": "M",
+   "base": 13100,
+   "variable": 500,
+   "fte": 1.0,
+   "tenure": 13.1
+  },
+  {
+   "id": "P-078",
+   "pos": "s14",
+   "sex": "M",
+   "base": 11250,
+   "variable": 450,
+   "fte": 1.0,
+   "tenure": 0.8
+  }
+ ],
+ "notes": {
+  "3": {
+   "status": "review",
+   "text": "Rynkowa premia dla programistów: do udokumentowania raportem płacowym, sama różnica rynkowa nie usprawiedliwia luki wewnątrz stanowiska."
+  }
+ },
+ "checklist": {
+  "widelki": true,
+  "nazwy": true
+ }
+}
