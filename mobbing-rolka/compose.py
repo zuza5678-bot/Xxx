@@ -25,9 +25,9 @@ XFADE = 0.7
 # sceny 1 i 3 są poziome: kamera przesuwa się po nich jak panorama w pionowym kadrze
 SCENES = [
     ("scene1", 6.0, (1.05, 1.12), ((0.80, 0.42), (0.38, 0.40))),   # szepczący -> ona
-    ("scene2", 6.0, (1.14, 1.03), ((0.50, 0.50), (0.50, 0.46))),
-    ("scene3", 6.5, (1.02, 1.12), ((0.47, 0.60), (0.41, 0.52))),
-    ("scene4", 6.0, (1.03, 1.12), ((0.50, 0.50), (0.50, 0.45))),
+    ("scene1", 6.0, (1.22, 1.30), ((0.30, 0.62), (0.36, 0.36))),   # kubek -> twarz
+    ("scene3", 6.5, (1.02, 1.12), ((0.47, 0.60), (0.41, 0.52))),   # parking
+    ("scene3", 6.0, (1.30, 1.00), ((0.52, 0.80), (0.45, 0.52))),   # telefon -> odjazd kamery
 ]
 END_CARD = 5.0
 DUR = sum(s[1] for s in SCENES) - XFADE * (len(SCENES) - 1) + END_CARD
@@ -198,7 +198,7 @@ def main():
         cmd += ["-i", music, "-filter_complex",
                 f"[1:a]atrim=0:{DUR},afade=t=in:d=1,afade=t=out:st={DUR - 2.0}:d=2.0,volume=0.9[a]",
                 "-map", "0:v", "-map", "[a]", "-c:a", "aac", "-b:a", "192k"]
-    cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
+    cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "25", "-tune", "grain", "-pix_fmt", "yuv420p",
             "-t", f"{DUR}", "-movflags", "+faststart", OUT]
     ff = subprocess.Popen(cmd, stdin=subprocess.PIPE)
 
