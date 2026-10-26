@@ -190,6 +190,8 @@ def main():
     scenes_end = DUR - END_CARD
 
     music = os.path.join(ASSETS, "music.mp3")
+    if not os.path.exists(music):
+        music = os.path.join(ASSETS, "music_synth.wav")
     cmd = ["ffmpeg", "-y", "-loglevel", "error",
            "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-"]
     if os.path.exists(music):
