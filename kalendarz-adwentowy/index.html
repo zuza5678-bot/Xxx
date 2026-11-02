@@ -78,6 +78,24 @@ dialog::backdrop { background: rgba(5,15,12,.7); backdrop-filter: blur(3px); }
 .basis { font-size: 14px; color: #6B5A48; }
 .card-body .btn { color: var(--fg-on-surface); border-color: #CDBB98; background: #fff; }
 .card-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+.quiz { border-top: 1px dashed #CDBB98; margin-top: 16px; padding-top: 14px; }
+.quiz h3 { margin: 0 0 6px; font-family: var(--f-display); font-size: 18px; }
+.quiz .q { margin: 0 0 10px; font-weight: 600; }
+.quiz .answers { display: flex; gap: 10px; flex-wrap: wrap; }
+.quiz .answers .btn[disabled] { opacity: .55; cursor: default; }
+.quiz .answers .btn.picked { opacity: 1; outline: 2px solid currentColor; }
+.verdict { margin: 12px 0 0; padding: 10px 14px; border-radius: 6px; }
+.verdict.ok { background: #DDEFE4; color: #154A33; }
+.verdict.bad { background: #F6DEDA; color: #6E1C16; }
+.score { display: inline-flex; gap: 6px; align-items: center; background: rgba(255,255,255,.08); border: 1px solid var(--door-line); border-radius: 999px; padding: 7px 14px; font-weight: 700; }
+.score b { color: var(--gold); }
+.diploma { margin: 28px auto 0; max-width: 640px; background: var(--surface); color: var(--fg-on-surface); border-radius: 16px; padding: 24px; text-align: center;
+  box-shadow: inset 0 0 0 3px var(--gold), inset 0 0 0 7px var(--surface), inset 0 0 0 8px var(--gold), var(--shadow); }
+.diploma small { letter-spacing: .18em; text-transform: uppercase; font-weight: 700; font-size: 12px; color: var(--red); }
+.diploma h2 { font-family: var(--f-display); font-size: clamp(24px, 5vw, 34px); margin: 6px 0; text-wrap: balance; }
+.diploma .medal { font-size: 48px; }
+.diploma p { margin: 6px 0; }
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
 footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 14px; }
 footer p { max-width: 720px; margin: 6px auto; }
 @media (prefers-reduced-motion: reduce) { .door .leaf { transition: none; } .door.today .leaf { animation: none; } }
@@ -85,6 +103,7 @@ footer p { max-width: 720px; margin: 6px auto; }
 </head>
 <body>
 <canvas id="snow" aria-hidden="true"></canvas>
+<canvas id="confetti" aria-hidden="true"></canvas>
 <div class="wrap">
   <header>
     <div class="kicker">Grudzień · 24 okienka · 24 prawa</div>
@@ -94,10 +113,18 @@ footer p { max-width: 720px; margin: 6px auto; }
 
   <div class="bar">
     <button class="btn" id="music" aria-pressed="false">🎵 <span>Włącz kolędy</span></button>
+    <span class="score" id="score" title="Poprawne odpowiedzi w quizie">⭐ Quiz: <b id="score-num">0</b> / 24</span>
     <span class="status" id="status"></span>
   </div>
 
   <main class="grid" id="grid" aria-label="Okienka kalendarza"></main>
+
+  <section class="diploma" id="diploma" hidden aria-live="polite">
+    <div class="medal" id="dip-medal" aria-hidden="true">🏅</div>
+    <small>Dyplom adwentowy</small>
+    <h2 id="dip-title"></h2>
+    <p id="dip-text"></p>
+  </section>
 
   <footer>
     <p>Okienko otwiera się tylko w swoim dniu grudnia (według daty na Twoim urządzeniu) i zostaje otwarte do końca miesiąca. Otwarte okienka zapamiętujemy w tej przeglądarce.</p>
@@ -116,6 +143,15 @@ footer p { max-width: 720px; margin: 6px auto; }
     <div id="dlg-text"></div>
     <div class="tip" id="dlg-tip"></div>
     <p class="basis" id="dlg-basis"></p>
+    <div class="quiz">
+      <h3>Quiz dnia: prawda czy fałsz?</h3>
+      <p class="q" id="quiz-q"></p>
+      <div class="answers">
+        <button class="btn" id="ans-true">✅ Prawda</button>
+        <button class="btn" id="ans-false">❌ Fałsz</button>
+      </div>
+      <p class="verdict" id="quiz-verdict" hidden></p>
+    </div>
     <div class="card-actions"><button class="btn" id="dlg-close">Zamknij</button></div>
   </div>
 </dialog>
@@ -220,6 +256,33 @@ const FACTS = [
     b:"Ustawa o dniach wolnych od pracy; art. 130 §2 i 151¹¹ Kodeksu pracy" }
 ];
 
+const QUIZ = [
+  ["Absolwent studiów wyższych może mieć 26 dni urlopu już po 2 latach pracy.", true, "Studia liczą się jak 8 lat stażu, więc razem z 2 latami pracy daje to 10 lat."],
+  ["Urlop na żądanie to 4 dni dodatkowe, ponad zwykły urlop wypoczynkowy.", false, "Te 4 dni są częścią Twojego urlopu wypoczynkowego."],
+  ["Jeśli 10. dzień miesiąca to niedziela, pracodawca może wypłacić pensję w poniedziałek.", false, "Wypłata musi nastąpić w dniu poprzedzającym, czyli najpóźniej w sobotę lub wcześniej."],
+  ["Za nadgodzinę w niedzielę, która nie jest Twoim dniem pracy, należy się dodatek 100%.", true, "Niedziele i święta niebędące dniami pracy to przypadek dodatku 100%."],
+  ["Odpoczynek tygodniowy musi trwać co najmniej 35 godzin.", true, "35 godzin nieprzerwanego odpoczynku, w tym 11 godzin odpoczynku dobowego."],
+  ["15-minutowa przerwa przy 8-godzinnym dniu pracy jest bezpłatna.", false, "Ta przerwa wlicza się do czasu pracy, więc jest płatna."],
+  ["Z 2 dni wolnych na opiekę nad dzieckiem skorzystasz, dopóki dziecko nie skończy 14 lat.", true, "Zwolnienie przysługuje rodzicom dzieci do 14. roku życia."],
+  ["Za dni wolne z powodu siły wyższej dostajesz 100% wynagrodzenia.", false, "Przysługuje 50% wynagrodzenia."],
+  ["Urlop opiekuńczy (5 dni) jest płatny.", false, "Urlop opiekuńczy jest bezpłatny, ale wlicza się do stażu pracy."],
+  ["Praca zdalna okazjonalna może trwać do 24 dni w roku.", true, "Tak, do 24 dni w roku kalendarzowym, na wniosek pracownika."],
+  ["Za okresowe badania lekarskie pracownik płaci z własnej kieszeni.", false, "Badania są na koszt pracodawcy."],
+  ["Odszkodowanie dla pracownika, który rozwiązał umowę przez mobbing, nie może być niższe niż płaca minimalna.", true, "Tak stanowi art. 94³ §4 Kodeksu pracy."],
+  ["Pracodawca może gorzej traktować pracownika tylko dlatego, że ma umowę na czas określony.", false, "Rodzaj umowy jest jednym z zakazanych kryteriów różnicowania."],
+  ["Płaca minimalna w 2026 r. wynosi 4806 zł brutto.", true, "Tyle wynosi minimalne wynagrodzenie za pełny etat w 2026 r."],
+  ["Pora nocna zawsze trwa od 22:00 do 6:00.", false, "Pora nocna to 8 godzin między 21:00 a 7:00, a dokładne godziny ustala pracodawca."],
+  ["Po 3 latach pracy u danego pracodawcy okres wypowiedzenia wynosi 3 miesiące.", true, "Przy stażu co najmniej 3 lat obowiązuje 3-miesięczne wypowiedzenie."],
+  ["Na odwołanie od wypowiedzenia do sądu pracy masz 30 dni.", false, "Masz 21 dni od doręczenia wypowiedzenia."],
+  ["O sprostowanie świadectwa pracy możesz wystąpić w ciągu 14 dni od jego otrzymania.", true, "Tak, termin to 14 dni."],
+  ["Umowa na czas określony pracownicy w ciąży zawsze kończy się w pierwotnym terminie.", false, "Jeśli miałaby się skończyć po 3. miesiącu ciąży, przedłuża się do dnia porodu."],
+  ["Urlop ojcowski można wykorzystać, zanim dziecko skończy 12 miesięcy.", true, "Tak, 2 tygodnie do ukończenia przez dziecko 12 miesięcy."],
+  ["Ochrona przedemerytalna obejmuje ostatnie 4 lata przed wiekiem emerytalnym.", true, "Tak, pod warunkiem że staż pozwoli uzyskać emeryturę."],
+  ["Niewykorzystany zaległy urlop przepada 1 października.", false, "Urlop trzeba udzielić do 30 września, ale on nie przepada. Roszczenie przedawnia się po 3 latach."],
+  ["Rekruter może zapytać, ile zarabiasz w obecnej pracy.", false, "Od 24 grudnia 2025 r. pracodawca nie może pytać o Twoje obecne ani wcześniejsze wynagrodzenie."],
+  ["Od 2025 r. Wigilia jest ustawowo dniem wolnym od pracy.", true, "Tak. Wesołych Świąt!"]
+];
+
 /* ---------- Kalendarz ---------- */
 const params = new URLSearchParams(location.search);
 const DEMO = params.has("demo");
@@ -231,6 +294,9 @@ const STORE = "adwent-prawo-pracy-" + now.getFullYear();
 let opened = new Set();
 try { opened = new Set(JSON.parse(localStorage.getItem(STORE) || "[]")); } catch (e) {}
 const save = () => { try { localStorage.setItem(STORE, JSON.stringify([...opened])); } catch (e) {} };
+let answers = {};
+try { answers = JSON.parse(localStorage.getItem(STORE + "-quiz") || "{}"); } catch (e) {}
+const saveAnswers = () => { try { localStorage.setItem(STORE + "-quiz", JSON.stringify(answers)); } catch (e) {} };
 
 const ORDER = [7,15,2,19,11,24,4,13,21,9,1,17,6,23,12,3,18,10,22,5,14,20,8,16];
 const grid = document.getElementById("grid");
@@ -271,7 +337,7 @@ function openDoor(el, day, locked) {
   const first = !el.classList.contains("open");
   el.classList.add("open");
   opened.add(day); save(); updateStatus();
-  if (first) chime();
+  if (first) { chime(); confetti(el); }
   setTimeout(() => showCard(day), first ? 650 : 0);
 }
 function showCard(day) {
@@ -282,10 +348,92 @@ function showCard(day) {
   document.getElementById("dlg-text").innerHTML = `<p>${f.p}</p>`;
   document.getElementById("dlg-tip").innerHTML = `<b>Dobrze wiedzieć:</b> ${f.tip}`;
   document.getElementById("dlg-basis").textContent = "Podstawa prawna: " + f.b;
+  renderQuiz(day);
+  dlg.appendChild(document.getElementById("confetti"));
   dlg.showModal();
 }
+let quizDay = 0;
+function renderQuiz(day) {
+  quizDay = day;
+  const [q] = QUIZ[day-1];
+  document.getElementById("quiz-q").textContent = q;
+  const done = day in answers;
+  for (const id of ["ans-true", "ans-false"]) {
+    const b = document.getElementById(id);
+    b.disabled = done;
+    b.classList.toggle("picked", done && answers[day].pick === (id === "ans-true"));
+  }
+  const v = document.getElementById("quiz-verdict");
+  if (done) showVerdict(day); else v.hidden = true;
+}
+function showVerdict(day) {
+  const [, truth, why] = QUIZ[day-1], ok = answers[day].pick === truth;
+  const v = document.getElementById("quiz-verdict");
+  v.className = "verdict " + (ok ? "ok" : "bad");
+  v.textContent = (ok ? "Brawo, dobra odpowiedź! " : `Niestety nie. To ${truth ? "prawda" : "fałsz"}. `) + why;
+  v.hidden = false;
+}
+function answer(pick) {
+  if (!quizDay || quizDay in answers) return;
+  answers[quizDay] = { pick };
+  saveAnswers();
+  renderQuiz(quizDay);
+  const ok = pick === QUIZ[quizDay-1][1];
+  if (ok) { chime(); confetti(document.querySelector(".card-top")); } else bell(220, 0.3);
+  updateScore();
+}
+document.getElementById("ans-true").addEventListener("click", () => answer(true));
+document.getElementById("ans-false").addEventListener("click", () => answer(false));
+function updateScore() {
+  const days = Object.keys(answers).map(Number);
+  const good = days.filter(d => answers[d].pick === QUIZ[d-1][1]).length;
+  document.getElementById("score-num").textContent = good;
+  const dip = document.getElementById("diploma");
+  if (days.length < 24) { dip.hidden = true; return; }
+  const levels = [[22, "🏆", "Mistrz Kodeksu Pracy", "Znasz swoje prawa lepiej niż niejeden dział kadr."],
+    [16, "🥇", "Znawca Prawa Pracy", "Świetny wynik. Twoje prawa są w dobrych rękach."],
+    [10, "🥈", "Świadomy Pracownik", "Dobra robota. Zajrzyj jeszcze raz do okienek z błędnymi odpowiedziami."],
+    [0, "🎁", "Adwentowy Odkrywca", "Każde otwarte okienko to wiedza, która może się przydać w pracy."]];
+  const [, medal, title, text] = levels.find(l => good >= l[0]);
+  document.getElementById("dip-medal").textContent = medal;
+  document.getElementById("dip-title").textContent = title;
+  document.getElementById("dip-text").textContent = `Wynik quizu: ${good} z 24 poprawnych odpowiedzi. ${text}`;
+  dip.hidden = false;
+}
+updateScore();
+
+/* ---------- Konfetti ---------- */
+const confetti = (() => {
+  const c = document.getElementById("confetti"), x = c.getContext("2d");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const colors = ["#E7B84F", "#B8322A", "#2A7F61", "#FFF4DB", "#3E6BB0"];
+  let parts = [], running = false;
+  const size = () => { c.width = innerWidth; c.height = innerHeight; };
+  size(); addEventListener("resize", size);
+  function frame() {
+    x.clearRect(0, 0, c.width, c.height);
+    parts = parts.filter(p => p.life > 0);
+    for (const p of parts) {
+      p.vy += 0.18; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+      x.save(); x.translate(p.x, p.y); x.rotate(p.rot); x.globalAlpha = Math.min(1, p.life / 30);
+      x.fillStyle = p.c; x.fillRect(-p.w/2, -p.h/2, p.w, p.h); x.restore();
+    }
+    if (parts.length) requestAnimationFrame(frame); else { running = false; x.clearRect(0, 0, c.width, c.height); }
+  }
+  return el => {
+    if (reduce || !el) return;
+    const r = el.getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2;
+    for (let i = 0; i < 90; i++) {
+      const a = Math.random() * Math.PI * 2, sp = 3 + Math.random() * 7;
+      parts.push({ x: cx, y: cy, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp - 4, rot: Math.random()*6, vr: (Math.random()-.5)*0.4,
+        w: 6 + Math.random()*6, h: 3 + Math.random()*4, c: colors[i % colors.length], life: 70 + Math.random()*40 });
+    }
+    if (!running) { running = true; requestAnimationFrame(frame); }
+  };
+})();
 document.getElementById("dlg-close").addEventListener("click", () => dlg.close());
 dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+dlg.addEventListener("close", () => document.body.appendChild(document.getElementById("confetti")));
 
 /* ---------- Śnieg ---------- */
 (() => {
